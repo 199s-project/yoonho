@@ -285,11 +285,38 @@ public class ProjectService {
 		return projectDAO.getProductByProductName(product_name);
 	}
 
+	
+	
+
+	// -----------------------------------------------------------------------------
 
 
+	public int companyNameValidation(String company_name) {
+		return projectDAO.companyNameValidation(company_name);
+	}
+	public int companyCodeValidation(String company_code) {
+		return projectDAO.companyCodeValidation(company_code);
+	}
 
+	public List<ProductVO> productList() {
+		return projectDAO.productList();
+	}
+	
+	
+	public int fileAmount(int product_num) {
+		return projectDAO.fileAmount(product_num);
+	}
+	
+	public FileVO findFirstImage(int product_num) {
+		return projectDAO.findFirstImage(product_num);
+	}
+	
+	public ProductVO getProductDetail (int product_num) {
+		return projectDAO.getProductDetail(product_num);
+	}
 
-
- 
-
+	public List<FileVO> getProductImages(int product_num) {
+		return projectDAO.getProductImages(product_num);
+	}
+	
 }

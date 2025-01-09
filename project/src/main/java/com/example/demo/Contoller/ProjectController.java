@@ -167,6 +167,7 @@ public class ProjectController {
 	@Value("${org.zerock.upload.path}")
 	private String uploadPath;
 	
+	
 	// 파일 업로드
     @PostMapping(value = "imageUpload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> imageUpload(@RequestParam(value="fileVO") MultipartFile[] files) {
@@ -188,7 +189,7 @@ public class ProjectController {
         		FileVO VO = new FileVO();
   			
         		VO.setFile_name(uploadName);
-        		VO.setFile_path("/C:\\uploads/" + uploadName);
+        		VO.setFile_path("images/" + uploadName);
         		VO.setFile_subject("product");
         		VO.setFile_pk(maxnum);
   			
@@ -319,7 +320,77 @@ public class ProjectController {
     
     
     
+    // ----------------------------------------------------------------------------------------
     
+    // 협력사 정보 등록 시 협력사 이름 중복 확인
+    @ResponseBody
+	@PostMapping("companyNameValidation")
+	public int companyNameValidation(@RequestParam("company_name") String company_name) {
+	    int cnt = projectService.companyNameValidation(company_name);
+	    return cnt;
+	}
+    
+	// 협력사 정보 등록 시 협력사 등록번호 중복 확인
+    @ResponseBody
+	@PostMapping("companyCodeValidation")
+	public int companyCodeValidation(@RequestParam("company_code") String company_code) {
+	    int cnt = projectService.companyCodeValidation(company_code);
+	    return cnt;
+	}
+    
+    // 제품 리스트 화면 이동
+    @GetMapping("product")
+    public String product(Model model) {
+  	   log.info("product");
+  	   
+  	   List<ProductVO> productList = projectService.productList();
+  	   
+  	   for (ProductVO product : productList) {
+  		   int product_num = product.getProduct_num();
+  		   
+  		   int amount = projectService.fileAmount(product_num);
+  		   
+  		   if (amount == 0) {
+  			   product.setFile_name("No Image");
+  			   product.setFile_path("vendors/images/product-img1.jpg");
+  		   } else {
+  			   FileVO file = projectService.findFirstImage(product_num);
+  			   product.setFile_amount(amount);
+  			   product.setFile_name(file.getFile_name());
+  			   product.setFile_path(file.getFile_path());
+  		   }
+  		   
+  	   }
+  	   
+  	   
+  	   model.addAttribute("productList",productList);
+  	   
+  	   return "product";
+	}
+    
+    @GetMapping("/getProductDetail")
+    public ResponseEntity<?> getProductDetail(@RequestParam("product_num") int product_num, Model model) {
+        ProductVO product = projectService.getProductDetail(product_num);
+        List<FileVO> files = projectService.getProductImages(product_num);
+        int amount = projectService.fileAmount(product_num);
+        
+        model.addAttribute("product",product);
+        
+        String[] imagePathArr = new String[amount];
+        int cnt = 0;
+        
+        for (FileVO file : files) {
+        	imagePathArr[cnt] = file.getFile_path();
+        	cnt++;
+        }
+        model.addAttribute("imagePathArr",imagePathArr);
+        
+        if (product != null) {
+            return ResponseEntity.ok(model);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
     
 
 	

@@ -266,11 +266,11 @@ public class BootstrapController {
 	    return "bootstrap/blog-detail";
 	}
 	
-	@GetMapping("product")
-	public String product(){
-	    log.info("product");
-	    return "bootstrap/product";
-	}
+//	@GetMapping("product")
+//	public String product(){
+//	    log.info("product");
+//	    return "bootstrap/product";
+//	}
 	
 	@GetMapping("product-detail")
 	public String product_detail(){

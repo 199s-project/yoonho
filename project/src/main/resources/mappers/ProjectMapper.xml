@@ -189,6 +189,35 @@
 
 
 
+	<!-- ========================================================================== -->
+
+	<select id="companyNameValidation" parameterType="String" resultType="java.lang.Integer">
+		select count(*) from company where company_name = #{company_name}
+	</select>
+	
+	<select id="companyCodeValidation" parameterType="String" resultType="java.lang.Integer">
+		select count(*) from company where company_busnum = #{company_code}
+	</select>
+	
+	<select id="productList" resultType="ProductVO">
+		select *, 0 as file_amount, 'file_name' as file_name, 'file_path' as file_path from product
+	</select>
+	
+	<select id="fileAmount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		select count(*) from file where file_pk = #{product_num}
+	</select>	
+	
+	<select id="findFirstImage" parameterType="java.lang.Integer" resultType="FileVO">
+		select * from file where file_pk = #{product_num} order by file_num desc limit 1
+	</select>
+	
+	<select id="getProductDetail" parameterType="java.lang.Integer" resultType="ProductVO"> 
+		select * from product where product_num = #{product_num} 
+	</select>
+
+	<select id="getProductImages" parameterType="java.lang.Integer" resultType="FileVO"> 
+		select * from file where file_pk = #{product_num} order by file_num desc
+	</select>
 
 
 </mapper>
