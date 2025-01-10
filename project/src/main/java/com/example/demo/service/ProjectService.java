@@ -213,7 +213,7 @@ public class ProjectService {
     	mv.addObject("products", products);
     	mv.addObject("productsJson", productsJson);
     	mv.addObject("companies", companies);
-    	mv.setViewName("quotationregister");
+    	mv.setViewName("quotationRegister");
     	return mv;
     }
     
@@ -317,6 +317,14 @@ public class ProjectService {
 
 	public List<FileVO> getProductImages(int product_num) {
 		return projectDAO.getProductImages(product_num);
+	}
+	
+	public List<CompanyVO> getCompanyList() {
+		return projectDAO.getCompanyList();
+	}
+	
+	public List<ProductVO> getProductList() {
+		return projectDAO.getProductList();
 	}
 	
 }

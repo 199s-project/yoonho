@@ -3,63 +3,16 @@
 <head>
 
 
-<style>
-
-</style>
 
 
 
 
-<script>
-function productDetail(path, num, amount) {
-	
-    let indicators = '';
-    let items = '';
 
-    for (let i = 0; i < amount; i++) {
-        indicators += `
-            <li data-target="#carouselExampleIndicators" data-slide-to="${i}" ${i === 0 ? 'class="active"' : ''}></li>
-        `;
 
-        items += `
-            <div class="carousel-item ${i === 0 ? 'active' : ''}">
-                <img class="d-block w-100" src="${path}" alt="Slide ${i + 1}">
-            </div>
-        `;
-    }
 
-    Swal.fire({
-        html: `
-            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-                <ol class="carousel-indicators">
-                    ${indicators}
-                </ol>
-                <div class="carousel-inner">
-                    ${items}
-                </div>
-                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                </a>
-                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                </a>
-            </div>
-            <div class="product-detail">
-	            <h3>${productName}</h3>
-	            <p>Price: ${productPrice.toLocaleString()}원</p>
-	        </div>
-        `,
-        showConfirmButton: false,
-        showCancelButton: true,
-        cancelButtonColor: "#d33",
-        cancelButtonText: "Cancel",
-        allowOutsideClick: false,
-    });
-}
 
-</script>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2dd2d56701b1014424c03e264ce110c1"></script>
 
 
 
@@ -104,6 +57,20 @@ function productDetail(path, num, amount) {
 				
 				<!-- Export Datatable start -->
 				
+				<div>
+					<div id="kakaomap" style="width: 500px; height: 400px;"></div>
+                     <script>
+						var mapContainer = document.getElementById('kakaomap');
+						var mapOptions = {
+							center: new kakao.maps.LatLng(33.450701, 126.570667),
+							level: 3
+						};
+							var map = new kakao.maps.Map(mapContainer, mapOptions); //지도 생성 및 객체 리턴
+						
+					</script>
+				</div>
+				
+				
 
 				<!-- Export Datatable End -->
 				
@@ -139,5 +106,14 @@ function productDetail(path, num, amount) {
 	<script src="src/plugins/datatables/js/pdfmake.min.js"></script>
 	<script src="src/plugins/datatables/js/vfs_fonts.js"></script>
 	<!-- Datatable Setting js -->
-	<script src="vendors/scripts/datatable-setting.js"></script></body>
+	<script src="vendors/scripts/datatable-setting.js"></script>
+	
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script>
+
+	</script>
+	
+	</body>
+
 </html>

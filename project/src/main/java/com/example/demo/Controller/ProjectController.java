@@ -1,4 +1,4 @@
-package com.example.demo.Contoller;
+package com.example.demo.Controller;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -282,6 +282,7 @@ public class ProjectController {
     // 판매계약서 등록 화면 이동
     @GetMapping("getQuotationRegister")
     public ModelAndView getQuotationRegister() throws Exception {
+    	log.info("QuotationRegister");
     	mv = projectService.getQuotationRegister();
         return mv;
     }
@@ -383,6 +384,7 @@ public class ProjectController {
         	imagePathArr[cnt] = file.getFile_path();
         	cnt++;
         }
+        
         model.addAttribute("imagePathArr",imagePathArr);
         
         if (product != null) {
@@ -392,6 +394,68 @@ public class ProjectController {
         }
     }
     
-
+    @ResponseBody
+    @GetMapping("/getCompanyNameList")
+    public String[] getCompanyNameList(Model model) {
+    	log.info("controller access");
+    	List<CompanyVO> companyList = projectService.getCompanyList();
+    	
+    	String[] companyNameList = new String[companyList.size()];
+    	int cnt = 0;
+    	for (CompanyVO company : companyList) {
+    		companyNameList[cnt] = company.getCompany_name();
+    		cnt++;
+    	}
+    	model.addAttribute("companyNameList",companyNameList);
+    	
+        return companyNameList;
+    }
 	
+    
+    @ResponseBody
+    @GetMapping("/getProductNameList")
+    public String[] getProductNameList(Model model) {
+    	log.info("controller access");
+    	List<ProductVO> productList = projectService.getProductList();
+    	
+    	String[] productNameList = new String[productList.size()];
+    	int cnt = 0;
+    	for (ProductVO product : productList) {
+    		productNameList[cnt] = product.getProduct_name();
+    		cnt++;
+    	}
+    	model.addAttribute("productNameList",productNameList);
+    	
+        return productNameList;
+    }
+ 
+    // 협력사 목록 화면 이동
+    @GetMapping("company")
+    public String company(Model model) {
+ 	   
+ 	   List<CompanyVO> list = projectService.getCompanyList();
+ 	   
+// 	   for (CompanyVO company : list) {
+// 		   company.setCompany_address(simpleAddress(company.getCompany_address()));
+// 	   }
+ 	   
+        model.addAttribute("companyList", list);
+ 	   return "company";
+    }
+    
+    public static String simpleAddress(String address) {
+    	if (address.length() < 8) {
+    		return "-";
+    	}
+        String trimmedAddress = address.substring(8);
+        String[] words = trimmedAddress.split(" ");
+
+        if (words.length >= 2) {
+            return words[0] + " " + words[1];
+        }
+        return "-";
+    }
+    
+    
+    
 }
