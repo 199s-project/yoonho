@@ -52,12 +52,14 @@ public interface ProjectDAO {
 
 	List<ProductVO> getProductList();
 		
-	CompanyVO getCompanyByCompanyName(String company_name);
+	
 
 	int insertOrderform(OrderformVO orderformVO);
 
 	int getLastOrderformNum();
 		
+	CompanyVO getCompanyByCompanyName(String company_name);
+	
 	ProductVO getProductByProductName(String product_name);	
 
 	int insertOrderformDetail(OrderformDetailVO orderformDetailVO);

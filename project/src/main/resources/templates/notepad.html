@@ -12,8 +12,61 @@
 
 
 
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2dd2d56701b1014424c03e264ce110c1"></script>
+<script>
 
+async function rowproductChange(event) {
+	const product_name = event.target.value;
+	const response = await fetch(`/getProductByProductName?product_name=${product_name}`);
+	const product = await response.json();
+	
+	const row = event.target.closest("tr");
+	const rownumElement = row.querySelector(".rownum");
+	const rownum = rownumElement.textContent.trim();
+	
+	document.getElementById("unit_price" + rownum).value = product.product_price;
+	
+	const quantity = document.getElementById("quantity" + rownum).value;
+	const total = quantity * product.product_price;
+	document.getElementById("total_price" + rownum).value = total;
+	
+	const rows = document.querySelectorAll(".rownum");
+	
+	let payment = 0;
+	
+	rows.forEach(row => {
+		const rownum = row.textContent.trim();
+		const totalPriceInput = document.getElementById("total_price" + rownum).value;
+		payment += parseInt(totalPriceInput);
+	});
+	document.getElementById("payment").value = payment;
+	document.getElementById("contract_deposit").value = payment * 0.1;
+}
+
+async function rowquantityChange(event) {
+	const quantity = event.target.value;
+	
+	const row = event.target.closest("tr");
+	const rownumElement = row.querySelector(".rownum");
+	const rownum = rownumElement.textContent.trim();
+	
+	const price = document.getElementById("unit_price" + rownum).value;
+	const total = quantity * price;
+	document.getElementById("total_price" + rownum).value = total;
+	
+	const rows = document.querySelectorAll(".rownum");
+	
+	let payment = 0;
+	
+	rows.forEach(row => {
+		const rownum = row.textContent.trim();
+		const totalPriceInput = document.getElementById("total_price" + rownum).value;
+		payment += parseInt(totalPriceInput);
+	});
+	document.getElementById("payment").value = payment;
+	document.getElementById("contract_deposit").value = payment * 0.1;
+}
+
+</script>
 
 
 </head>
