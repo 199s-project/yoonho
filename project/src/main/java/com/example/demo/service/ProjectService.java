@@ -327,4 +327,9 @@ public class ProjectService {
 		return projectDAO.getProductList();
 	}
 	
+	public int updateCompany(CompanyVO companyVO) {
+		return projectDAO.updateCompany(companyVO);
+	}
+	
+	
 }

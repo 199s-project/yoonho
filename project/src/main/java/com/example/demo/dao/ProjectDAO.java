@@ -87,4 +87,6 @@ public interface ProjectDAO {
 	
 	List<FileVO> getProductImages(int product_num);
 	
+	int updateCompany(CompanyVO companyVO);
+	
 }

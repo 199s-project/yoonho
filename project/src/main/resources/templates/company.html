@@ -158,7 +158,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 <script type="text/javascript" src="https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js"></script>
 
 
-<script>
+<script th:inline="javascript">
 
 
 
@@ -220,10 +220,42 @@ function openKakaomap(address, name) {
 }
 
 
-async function updateCompany(company_name) {
+async function updateCompany(company_name, company_address) {
 	
 	const response = await fetch(`/getCompanyByCompanyName?company_name=${company_name}`);
 	const company = await response.json();
+	
+	const address = company_address;
+	
+    const split = ["", "", ""]; // 주소창에 기존 주소 띄우려고 만든 배열
+
+    const firstOpen = address.indexOf("("); // 첫번째 여는괄호 위치(index)
+    const firstClose = address.indexOf(")"); // 첫번째 닫는괄호 위치(index)
+    if (firstOpen !== -1 && firstClose !== -1) {
+        split[0] = address.substring(firstOpen + 1, firstClose).trim();
+    }
+
+    const lastOpen = address.lastIndexOf("(");
+    const lastClose = address.lastIndexOf(")");
+    if (lastOpen !== -1 && lastClose > lastOpen) {
+        split[2] = address.substring(lastOpen + 1, lastClose).trim();
+    }
+
+    let remainingAddress = address;
+    if (split[0]) {
+        remainingAddress = remainingAddress.replace(`(${split[0]})`, "").trim();
+    }
+    if (split[2]) {
+        remainingAddress = remainingAddress.replace(`(${split[2]})`, "").trim();
+    }
+    split[1] = remainingAddress;
+    
+    if (firstOpen !== 0 || split[0].length !== 5) {
+    	split[0] = "";
+    	split[1] = "";
+    	split[2] = remainingAddress;
+    }
+	
 	
 	Swal.fire({
 		html: `
@@ -236,31 +268,34 @@ async function updateCompany(company_name) {
 	  			<tbody>
 	  				<tr>
 	  					<td class="heading-td"> 회사명 </td>
-	  					<td> <input id="company-input1" class="swal2-input" value="${company.company_name}" placeholder="회사명" oninput="company_nameValidation()"> <input id="company-name-validation-result" class="swal2-input company-name-validation-result" readonly placeholder="중복여부"> </td>
+	  					<td> 
+	  						<input id="company-input1" class="swal2-input" value="${company.company_name}" placeholder="회사명" data-company-name="${company_name}" oninput="company_nameValidation(this.dataset.companyName)"> 
+	  						<input id="company-name-validation-result" class="swal2-input company-name-validation-result" readonly placeholder="중복여부"> 
+	  					</td>
 	  				</tr>
 	  				<tr>
 	  					<td class="heading-td"> 사업자번호 </td>
-	  					<td> <input id="company-input2" class="swal2-input" placeholder="사업자번호" oninput="company_codeValidation()"> <input id="company-code-validation-result" class="swal2-input company-code-validation-result" readonly placeholder="중복여부"> </td>
+	  					<td> <input id="company-input2" class="swal2-input" value="${company.company_busnum}"  placeholder="사업자번호" readonly> <input id="company-code-validation-result" class="swal2-input company-code-validation-result" readonly placeholder="변경불가"> </td>
 	  				</tr>	  					
 	  				<tr>
 	  					<td class="heading-td"> 대표자명 </td>
-	  					<td> <input id="company-input3" class="swal2-input" placeholder="대표자명"> </td>
+	  					<td> <input id="company-input3" class="swal2-input" value="${company.company_ceo}" placeholder="대표자명"> </td>
 	  				</tr>
 	  				<tr>
 	  					<td class="heading-td"> 연락처 </td>
-	  					<td> <input id="company-input4" class="swal2-input" placeholder="연락처"> </td>
+	  					<td> <input id="company-input4" class="swal2-input" value="${company.company_phone}" placeholder="연락처"> </td>
 	  				</tr>
 	  				<tr>
 	  					<td class="heading-td"> 이메일 </td>
-	  					<td> <input id="company-input5" class="swal2-input" placeholder="이메일"> </td>
+	  					<td> <input id="company-input5" class="swal2-input" value="${company.company_email}" placeholder="이메일"> </td>
 	  				</tr>
 	  				<tr>
 	  					<td class="heading-td"> 회사 주소 </td>
 	  					<td> 
-	  						<input style="margin: 0.75em 0 0 0;" id="zipcode" class="swal2-input" size="10" readonly placeholder="우편번호" >
+	  						<input style="margin: 0.75em 0 0 0;" id="zipcode" class="swal2-input" value="${split[0]}" size="10" readonly placeholder="우편번호" >
 		  					<input style="margin: 0.75em 0 0 0;" class="swal2-input" id="daumaddress" type="button" value="우편번호 검색" onclick="execDaumPostcode()">
-				            <input style="margin: 0.5em 0 0 0;" id="address1" class="swal2-input" type="text" readonly placeholder="도로명 주소"/>
-				            <input style="margin: 0.5em 0 0.75em 0;" id="address2" class="swal2-input" type="text" placeholder="상세주소 입력"/>
+				            <input style="margin: 0.5em 0 0 0;" id="address1" class="swal2-input" value="${split[1]}" type="text" readonly placeholder="도로명 주소"/>
+				            <input style="margin: 0.5em 0 0.75em 0;" id="address2" class="swal2-input" value="${split[2]}" type="text" placeholder="상세주소 입력"/>
 				            <input type="hidden" id="address_content" name="address_content">
 	  					</td>
 	  				</tr>
@@ -286,8 +321,9 @@ async function updateCompany(company_name) {
 				addressString = "(" + zipcode + ") " + address1 + " (" + address2 + ")";
 			}
 	        
+			const inputName = document.getElementById("company-input1").value;
 			const name = document.getElementById("company-name-validation-result").value;
-			const busnum = document.getElementById("company-code-validation-result").value;
+			const busnum = document.getElementById("company-input2").value;
 			const ceo = document.getElementById("company-input3").value;
 			const phone = document.getElementById("company-input4").value;
 			const email = document.getElementById("company-input5").value;
@@ -295,7 +331,7 @@ async function updateCompany(company_name) {
 			const val1 = document.getElementById("company-name-validation-result").value;
 			const val2 = document.getElementById("company-code-validation-result").value;
 	      
-			if (!name || !busnum || !ceo || !phone || !email || !zipcode) {
+			if (!inputName || !ceo || !phone || !email || !zipcode) {
 				Swal.showValidationMessage("모든 입력란을 채워주세요!");
 				return false;
 			}
@@ -308,7 +344,7 @@ async function updateCompany(company_name) {
 				return false;
 			}
 			return { 
-				company_name: name, 
+				company_name: inputName, 
 				company_busnum: busnum, 
 				company_ceo: ceo, 
 				company_phone: phone, 
@@ -318,7 +354,7 @@ async function updateCompany(company_name) {
 		}
 	}).then((result) => {
 		if (result.isConfirmed) {
-			fetch('/addCompany', {
+			fetch('/updateCompany', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -327,9 +363,15 @@ async function updateCompany(company_name) {
 			})
 			.then(response => {
 				if (response.ok) {
-					Swal.fire("성공", "회사 정보가 성공적으로 추가되었습니다.", "success");
+					Swal.fire("성공", "회사 정보가 성공적으로 수정되었습니다.", "success")
+					.then(result => {
+						location.reload();
+					});
 				} else {
-					Swal.fire("실패", "회사 정보를 추가하지 못했습니다.", "error");
+					Swal.fire("실패", "회사 정보를 수정하지 못했습니다.", "error")
+					.then(result => {
+						location.reload();
+					});
 				}
 			})
 			.catch(error => {
@@ -388,7 +430,7 @@ function execDaumPostcode() {
 
 <script>
 
-function company_nameValidation() {
+function company_nameValidation(companyName) {
 	var company_name = $("#company-input1").val();
 	if (!company_name) {
 		$('.company-name-validation-result').attr('value', '');
@@ -399,10 +441,14 @@ function company_nameValidation() {
 			data: {company_name : company_name},
 			success: function(cnt) {
 				if (cnt > 0) {
-					$('.company-name-validation-result').attr('value', '사용불가');
-					$('.company-name-validation-result').css({
-						"color" : "red",
-					});
+					if (company_name.toUpperCase() === companyName.toUpperCase()) {
+						$('.company-name-validation-result').attr('value', '기존 이름 사용');
+					} else {
+						$('.company-name-validation-result').attr('value', '사용불가');
+						$('.company-name-validation-result').css({
+							"color" : "red",
+						});
+					}
 				} else {
 					$('.company-name-validation-result').attr('value', '사용가능');
 					$('.company-name-validation-result').css({
@@ -414,31 +460,7 @@ function company_nameValidation() {
 	}
 }
 
-function company_codeValidation() {
-	var company_code = $("#company-input2").val();
-	if (!company_code) {
-		$('.company-code-validation-result').attr('value', '');
-	} else {
-		$.ajax({
-			type: "POST",
-			url: "/companyCodeValidation",
-			data: {company_code : company_code},
-			success: function(cnt) {
-				if (cnt > 0) {
-					$('.company-code-validation-result').attr('value', '사용불가');
-					$('.company-code-validation-result').css({
-						"color" : "red",
-					});
-				} else {
-					$('.company-code-validation-result').attr('value', '사용가능');
-					$('.company-code-validation-result').css({
-						"color" : "green",
-					});
-				}
-			}
-		});
-	}
-}
+
 
 </script>
 
@@ -510,7 +532,7 @@ function company_codeValidation() {
 											<td><th:block th:text="${form.company_email}"></th:block></td>
 											<td><span th:text="${form.company_address}" th:onclick="openKakaomap([[${form.company_address}]],[[${form.company_name}]])"
 												style="cursor:pointer;"></span></td>
-											<td><span th:text="수정" th:onclick="updateCompany([[${form.company_name}]])"
+											<td><span th:text="수정" th:onclick="updateCompany([[${form.company_name}]],[[${form.company_address}]])"
 												style="cursor:pointer;"></td>
 										</tr>
 									</th:block>

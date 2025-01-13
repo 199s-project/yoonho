@@ -219,5 +219,13 @@
 		select * from file where file_pk = #{product_num} order by file_num desc
 	</select>
 
+	<update id="updateCompany" parameterType="CompanyVO">
+		update company
+		set
+		company_name = #{company_name}, company_ceo = #{company_ceo}, company_phone = #{company_phone},
+		company_email = #{company_email}, company_address = #{company_address}
+		where company_busnum = #{company_busnum}
+	</update>
+
 
 </mapper>

@@ -456,6 +456,12 @@ public class ProjectController {
         return "-";
     }
     
-    
+	@PostMapping("updateCompany")
+	public String updateCompany(@RequestBody CompanyVO companyVO){
+	    String name = companyVO.getCompany_name();
+	    log.info("Company's name is : "+ name);
+	    int r = projectService.updateCompany(companyVO);
+	    return "company";
+	}
     
 }
