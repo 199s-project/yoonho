@@ -228,4 +228,27 @@
 	</update>
 
 
+	<select id="getQuotationDetailList" parameterType="java.lang.Integer" resultType="QuotationDetailVO">
+		select * from quotationdetail where quot_num = #{quot_num}
+	</select>
+	
+	<select id="getInventory" parameterType="java.lang.Integer" resultType="InventoryVO">
+		select * from inventory where inven_type = 1 and inven_item_num = #{product_num}
+	</select>
+
+	<update id="updateInventoryAmount" parameterType="java.util.Map">
+		update inventory
+		set
+		inven_amount = inven_amount - #{amount}
+		where inven_item_num = #{product_num}
+	</update>
+
+	<update id="updateQuotationStat" parameterType="java.lang.Integer">
+		update quotation
+		set
+		quot_stat = "완료"
+		where quot_num = #{quot_num}
+	</update>
+
+
 </mapper>

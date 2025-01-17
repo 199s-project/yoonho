@@ -164,19 +164,19 @@ function addproduct() {
 			fetch('/addProduct', {
 				method: 'POST',
 				headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				product_name: result.value.product_name,
-				product_code: result.value.product_code,
-				product_brand: result.value.product_brand,
-				product_category: result.value.product_category,
-				product_price: result.value.product_price,
-			}),
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.text().then(text => {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					product_name: result.value.product_name,
+					product_code: result.value.product_code,
+					product_brand: result.value.product_brand,
+					product_category: result.value.product_category,
+					product_price: result.value.product_price,
+				}),
+			})
+			.then(response => {
+				if (!response.ok) {
+					return response.text().then(text => {
 					throw new Error(`Error: ${text}`);
 				});
 			}

@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.example.demo.dto.CompanyVO;
 import com.example.demo.dto.FileVO;
+import com.example.demo.dto.InventoryVO;
 import com.example.demo.dto.MemberVO;
 import com.example.demo.dto.OrderformDetailVO;
 import com.example.demo.dto.OrderformVO;
@@ -88,5 +90,16 @@ public interface ProjectDAO {
 	List<FileVO> getProductImages(int product_num);
 	
 	int updateCompany(CompanyVO companyVO);
+	
+	
+	
+	List<QuotationDetailVO> getQuotationDetailList(int quot_num);
+	
+	InventoryVO getInventory(int product_num);
+	
+	int updateInventoryAmount(@Param("product_num")int product_num, @Param("amount")int amount);
+	
+	int updateQuotationStat(int quot_num);
+	
 	
 }

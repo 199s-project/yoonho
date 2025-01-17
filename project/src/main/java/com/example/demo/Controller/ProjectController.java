@@ -23,8 +23,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.example.demo.dto.CompanyVO;
 import com.example.demo.dto.FileVO;
+import com.example.demo.dto.InventoryVO;
 import com.example.demo.dto.OrderformVO;
 import com.example.demo.dto.ProductVO;
+import com.example.demo.dto.QuotationDetailVO;
 import com.example.demo.dto.QuotationVO;
 import com.example.demo.service.ProjectService;
 
@@ -464,4 +466,39 @@ public class ProjectController {
 	    return "company";
 	}
     
+	@ResponseBody
+	@PostMapping("quotationProceed")
+	public int quotationProceed(@RequestParam("quot_num") int quot_num){
+	    log.info("Quotation number is : "+ quot_num);
+	    List<QuotationDetailVO> quotdetailList = projectService.getQuotationDetailList(quot_num);
+	    
+	    for (QuotationDetailVO quotdetail : quotdetailList) {
+	    	
+	    	int product_num = quotdetail.getProduct_num();
+	    	int amount = quotdetail.getQuotdetail_amount();
+	    	
+	    	InventoryVO inventory = projectService.getInventory(product_num);
+	    	if (inventory == null) {
+	    		return 0;
+	    	}
+	    	if (amount > inventory.getInven_amount()) {
+	    		return 0;
+	    	}
+	    }
+	    
+	    for (QuotationDetailVO quotdetail : quotdetailList) {
+	    	
+	    	int product_num = quotdetail.getProduct_num();
+	    	int amount = quotdetail.getQuotdetail_amount();
+	    	
+	    	int r = projectService.updateInventoryAmount(product_num, amount);
+	    }
+	    
+	    int s = projectService.updateQuotationStat(quot_num);
+	    
+	    return 1;
+	}
+	
+	
+	
 }

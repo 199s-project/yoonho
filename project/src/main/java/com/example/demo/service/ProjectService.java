@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.example.demo.dao.ProjectDAO;
 import com.example.demo.dto.CompanyVO;
 import com.example.demo.dto.FileVO;
+import com.example.demo.dto.InventoryVO;
 import com.example.demo.dto.MemberVO;
 import com.example.demo.dto.OrderformDetailVO;
 import com.example.demo.dto.OrderformVO;
@@ -330,6 +331,24 @@ public class ProjectService {
 	public int updateCompany(CompanyVO companyVO) {
 		return projectDAO.updateCompany(companyVO);
 	}
+	
+	public List<QuotationDetailVO> getQuotationDetailList(int quot_num) {
+		return projectDAO.getQuotationDetailList(quot_num);
+	}
+	
+	public InventoryVO getInventory(int product_num) {
+		return projectDAO.getInventory(product_num);
+	}
+	
+	public int updateInventoryAmount(int product_num, int amount) {
+		return projectDAO.updateInventoryAmount(product_num, amount);
+	}
+	
+	public int updateQuotationStat(int quot_num) {
+		return projectDAO.updateQuotationStat(quot_num);
+	}
+	
+	
 	
 	
 }
