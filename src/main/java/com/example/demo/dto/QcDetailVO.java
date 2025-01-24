@@ -13,4 +13,6 @@ public class QcDetailVO {
 	private int qc_num;		// qc 번호
 	private int qcq_num;	// 질문 번호
 	private int qc_fail_quan;	// 불량 건수
+	
+	private String qc_tester; // (01-20 추가) 검수자
 }

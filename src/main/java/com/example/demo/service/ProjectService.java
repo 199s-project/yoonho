@@ -27,6 +27,7 @@ import com.example.demo.dto.QcVO;
 import com.example.demo.dto.QuotationDetailVO;
 import com.example.demo.dto.QuotationVO;
 import com.example.demo.dto.RecipeDetailVO;
+import com.example.demo.dto.RecipeVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
@@ -322,69 +323,119 @@ public class ProjectService {
 	// 나현. 시작.
 		// QC
 
-			// QC 전체 리스트
-			public List<QcVO> getQcList() {
-				return projectDAO.getQcList();
-			}
-			
-			// QC 1건 정보
-			public QcVO getOneQc(int qc_num) {
-				log.info("getOneQc - Service");
-				return projectDAO.getOneQc(qc_num);
-			}
-			
-			// QC 원자재 이름
-			public String getQcMName(int qc_num) {
-				log.info("getQcMName - Service");
-				return projectDAO.getQcMName(qc_num);
-			}
-			
-			// QC 제품 이름
-			public String getQcPName(int qc_num) {
-				log.info("getQcPName - Service");
-				return projectDAO.getQcPName(qc_num);
-			}
-			
-			// QC 1건 질문 - 응답 정보
-			public List<QcVO> getOneQcDetail(int qc_num) {
-				log.info("getOneQcDetail - Service");
-				return projectDAO.getOneQcDetail(qc_num);
-			}
-
-			// QC 총 부적격 수량
-			public int getTotalFail(int qc_num) {
-				return projectDAO.getTotalFail(qc_num);
-			}
-			
-			// Qc Detail 기존 값 존재 확인
-			public int isQcDetail(QcDetailVO qcDetail) {
-				return projectDAO.isQcDetail(qcDetail);
-			}
-			
-			// (기존 값 없음) QC Detail 추가
-			public int insertQcDetail(QcDetailVO qcDetails) {
-				return projectDAO.insertQcDetail(qcDetails);
-			}
-			
-			// (기존 값 있음) QC Detail 업데이트
-			public int updateQcDetail(QcDetailVO qcDetails) {
-				return projectDAO.updateQcDetail(qcDetails);
-			}
-			
-			// QC 저장 버튼, 상태 : 검사중 (1)
-			public int updateQcStat1(int qc_num) {
-				return projectDAO.updateQcStat1(qc_num);
-			}
-			
-			// QC 제출 버튼, 상태 : 검사 완료 (2)
-			public int updateQcStat2(int qc_num) {
-				return projectDAO.updateQcStat2(qc_num);
-			}
-			
-			// QC 제출 버튼, inventory 수량 증가
-			public int updateInven(InventoryVO inven) {
-				return projectDAO.updateInven(inven);
-			}
+		// QC 전체 리스트
+		public List<QcVO> getQcList() {
+			return projectDAO.getQcList();
+		}
+		
+		// QC 리스트 : 검사 전 0
+		public List<QcVO> getQcList0() {
+			return projectDAO.getQcList0();
+		}
+		
+		// QC 리스트 : 작성 중 1
+		public List<QcVO> getQcList1() {
+			return projectDAO.getQcList1();
+		}
+		
+		// QC 리스트 : 검사 완료 2
+		public List<QcVO> getQcList2() {
+			return projectDAO.getQcList2();
+		}
+		
+		// QC 1건 정보
+		public QcVO getOneQc(int qc_num) {
+			log.info("getOneQc - Service");
+			return projectDAO.getOneQc(qc_num);
+		}
+		
+		// QC 원자재 이름
+		public String getQcMName(int qc_num) {
+			log.info("getQcMName - Service");
+			return projectDAO.getQcMName(qc_num);
+		}
+		
+		// QC 제품 이름
+		public String getQcPName(int qc_num) {
+			log.info("getQcPName - Service");
+			return projectDAO.getQcPName(qc_num);
+		}
+		
+		// QC 1건 질문 - 응답 정보
+		public List<QcVO> getOneQcDetail(int qc_num) {
+			log.info("getOneQcDetail - Service");
+			return projectDAO.getOneQcDetail(qc_num);
+		}
+	
+		// QC 총 부적격 수량
+		public int getTotalFail(int qc_num) {
+			return projectDAO.getTotalFail(qc_num);
+		}
+		
+		// Qc Detail 기존 값 존재 확인
+		public int isQcDetail(QcDetailVO qcDetail) {
+			return projectDAO.isQcDetail(qcDetail);
+		}
+		
+		// (기존 값 없음) QC Detail 추가
+		public int insertQcDetail(QcDetailVO qcDetails) {
+			return projectDAO.insertQcDetail(qcDetails);
+		}
+		
+		// (기존 값 있음) QC Detail 업데이트
+		public int updateQcDetail(QcDetailVO qcDetails) {
+			return projectDAO.updateQcDetail(qcDetails);
+		}
+		
+		// QC 저장 버튼, 상태 : 검사중 (1)
+		public int updateQcStat1(int qc_num) {
+			return projectDAO.updateQcStat1(qc_num);
+		}
+		
+		// QC 제출 버튼, 상태 : 검사 완료 (2)
+		public int updateQcStat2(int qc_num) {
+			return projectDAO.updateQcStat2(qc_num);
+		}
+					
+		// QC 제출 버튼, inventory 수량 증가
+		public int updateInven(InventoryVO inven) {
+			return projectDAO.updateInven(inven);
+		}
+		
+		// QC 제출 버튼, 제출자 session
+		public int updateQcTester(QcVO qc) {
+			return projectDAO.updateQcTester(qc);
+		}
+		
+		
+		//
+		public OrderformVO getOrderformByPapernum(int paper_num) {
+			return projectDAO.getOrderformByPapernum(paper_num);
+		}
+		
+		public int getLastOrderformNum() {
+			return projectDAO.getLastOrderformNum();
+		}
+		
+		public int insertOrderform(OrderformVO of) {
+			return projectDAO.insertOrderform(of);
+		}
+		
+		public int insertOrderformDetail(OrderformDetailVO ofd) {
+			return projectDAO.insertOrderformDetail(ofd);
+		}
+		
+		public int getMaterialPrice(int inven_item_num) {
+			return projectDAO.getMaterialPrice(inven_item_num);
+		};
+		
+		public ProductionVO getProductionByPapernum(int paper_num) {
+			return projectDAO.getProductionByPapernum(paper_num);
+		}
+		
+		public int insertProductionDetail(ProductionDetailVO pdd) {
+			return projectDAO.insertProductionDetail(pdd);
+		}
 			
 		// 나현. 끝.
 
@@ -464,10 +515,6 @@ public class ProjectService {
 	
 	public CompanyVO getCompanyByCompanynum(int company_num) {
 		return projectDAO.getCompanyByCompanynum(company_num);
-	}
-	
-	public List<InventoryVO> getInventoryList() {
-		return projectDAO.getInventoryList();
 	}
 	
 	public List<InventoryVO> getInventoryMaterialList() {
@@ -649,6 +696,129 @@ public class ProjectService {
 		return projectDAO.addProductInventory(inventoryVO);
 	}
 	
+	public int productNameCheck(String product_name) {
+		return projectDAO.productNameCheck(product_name);
+	}
+	
+	public String[] getProductCodeAndNameListConcat() {
+		return projectDAO.getProductCodeAndNameListConcat();
+	}
+	
+	public int addRecipe(@RequestParam Map<String,Object> map) throws Exception {
+    	
+    	String product_code = (String)map.get("recipe-input1");
+    	String product_code_replaced = product_code.replaceAll("\\(.*\\)$", ""); // ex) aaaa01(product01)을 aaaa01로 바꾸는 코드
+    	RecipeVO recipeVO = new RecipeVO();
+    	recipeVO.setProduct_name((String)map.get("recipe-input2"));
+    	recipeVO.setProduct_code(product_code_replaced);
+    	recipeVO.setRecipe_price(Integer.parseInt((String) map.get("recipe-input3")));
+    	
+    	int result = projectDAO.insertRecipe(recipeVO);
+    	
+    	int product_num = projectDAO.getProductNumByProductCode(product_code_replaced);
+    	int LastRecipeNum = projectDAO.getLastRecipeNum();
+    	int i = 1;
+    	
+    	for (;;) {
+    		String a = "material-name-input" + i;
+    		String b = "material-amount-input" + i;
+    		i += 1;
+    		RecipeDetailVO recipeDetailVO = new RecipeDetailVO();
+    		String material_name = (String)(map.get(a));
+    		int material_amount = Integer.parseInt((String)(map.get(b)));
+    		
+    		if(material_name == "") {
+    			continue;
+    		}
+    		if(material_amount == 0) {
+    			continue;
+    		}
+    		
+    		recipeDetailVO.setRecipe_num(LastRecipeNum);
+    		recipeDetailVO.setProduct_num(product_num);
+    		recipeDetailVO.setMaterial_name(material_name);
+    		recipeDetailVO.setMaterial_amount(material_amount);
+    		
+    		int result2 = projectDAO.insertRecipeDetail(recipeDetailVO);
+    	}
+    }
+	
+	public int recipeProductCodeCheck(String product_code) {
+		return projectDAO.recipeProductCodeCheck(product_code);
+	}
+	
+	public ModelAndView getRecipe() {
+		mv = new ModelAndView();
+		List<RecipeVO> recipeVOList = projectDAO.getRecipeList();
+		
+		mv.addObject("recipeVOList",recipeVOList);
+		mv.setViewName("recipe");
+		return mv;
+	}
+	
+	public List<RecipeDetailVO> getRecipeDetailByProductcode(
+			@RequestParam("product_code") String product_code) {
+		
+		int product_num = projectDAO.getProductNumByProductCode(product_code);
+		List<RecipeDetailVO> recipeDetailListVO = projectDAO.getRecipeDetailByProductNum(product_num);
+		
+		return recipeDetailListVO;
+	}
+	
+	public RecipeVO getRecipeByRecipeNum(
+			@RequestParam("recipe_num") int recipe_num
+			) {
+		RecipeVO recipeVO = projectDAO.getRecipeByRecipeNum(recipe_num);
+		return recipeVO;
+	}
+	
+	public int updateRecipe(@RequestParam Map<String,Object> map) throws Exception {
+		int recipe_num = Integer.parseInt((String)map.get("recipe-input4"));
+		String product_code = (String)map.get("recipe-input1");
+		String product_name = (String)map.get("recipe-input2");
+		int recipe_price = Integer.parseInt((String)map.get("recipe-input3"));
+		
+		RecipeVO recipeVO = new RecipeVO();
+		recipeVO.setRecipe_num(recipe_num);
+		recipeVO.setProduct_code(product_code);
+		recipeVO.setProduct_name(product_name);
+		recipeVO.setRecipe_price(recipe_price);
+		
+		int result = projectDAO.updateRecipe(recipeVO);
+		int i = 1;
+		for(;;) {
+			String a = "material-name-input" + i;
+			String b = "material-amount-input" + i;
+			String c = "recipedetail-num" + i;
+			i += 1;
+			RecipeDetailVO recipeDetailVO = new RecipeDetailVO();
+			String material_name = (String)(map.get(a));
+			int material_amount = Integer.parseInt((String)(map.get(b)));
+			int rd_num = Integer.parseInt((String)map.get(c));
+			
+			if (material_name == "") {
+				continue;
+			}
+			if (material_amount == 0) {
+				continue;
+			}
+			
+			recipeDetailVO.setRd_num(rd_num);
+			recipeDetailVO.setMaterial_name(material_name);
+			recipeDetailVO.setMaterial_amount(material_amount);
+			int result2 = projectDAO.updateRecipeDetail(recipeDetailVO);
+			
+		}
+		
+	}
+	
+	public List<OrderformDetailVO> getOrderformDetailListByOrderformnum (int orderform_num) {
+		return projectDAO.getOrderformDetailListByOrderformnum(orderform_num);
+	}
+	
+	public int updateOrderformFinish(int orderform_num) {
+		return projectDAO.updateOrderformFinish(orderform_num);
+	}
 	
 	// ---------------new 작업공간 (이의재) ----------------------------
 	
@@ -657,8 +827,8 @@ public class ProjectService {
 	
 	public List<ProductionVO> getProductionList() {
 		// TODO Auto-generated method stub
-		log.info("getFatoryWorkList()");
-		return projectDAO.getFatoryWorkList();
+		log.info("getProductionList()");
+		return projectDAO.getProductionList();
 	}
 	
 	public int setproductionForm(List<ProductionDetailVO> list) {
@@ -699,9 +869,70 @@ public class ProjectService {
 		return projectDAO.reduceInventoryAmount(inventoryVO);
 	}
 
+	public int setPdCheckUpdate(ProductionVO productionVO) {
+		// TODO Auto-generated method stub
+		return projectDAO.setPdCheckUpdate(productionVO);
+	}
+
 	public int insertqc(QcVO qcVO) {
+		// TODO Auto-generated method stub
 		return projectDAO.insertqc(qcVO);
-	}		
+	}
+
+	public List<ProductionVO> getFatoryWorkList() {
+		// TODO Auto-generated method stub
+		return projectDAO.getFatoryWorkList();
+	}
+
+	public ProductVO getfindProductNum(ProductVO productVO) {
+		// TODO Auto-generated method stub
+		return projectDAO.getfindProductNum(productVO);
+	}
+
+	public InventoryVO getInventoryByProductName(String product_name) {
+		// TODO Auto-generated method stub
+		return projectDAO.getInventoryByProductName(product_name);
+	}
+
+	public List<RecipeDetailVO> getTotalAmount(String product_name) {
+		// TODO Auto-generated method stub
+		return projectDAO.getTotalAmount(product_name);
+	}
+
+	public List<InventoryVO> getInventoryList() {
+		// TODO Auto-generated method stub
+		return projectDAO.getInventoryList();
+	}
+
+	public List<ProductionDetailVO> getProductionDetail(int pd_num) {
+		// TODO Auto-generated method stub
+		return projectDAO.getProductionDetail(pd_num);
+	}
+
+	public List<RecipeDetailVO> getRecipeDetailList() {
+		// TODO Auto-generated method stub
+		return projectDAO.getRecipeDetailList();
+	}
+
+	public  InventoryVO getInvenAmount(String Mname) {
+		// TODO Auto-generated method stub
+		return projectDAO.getInvenAmount(Mname);
+	}
+
+	public List<ProductionDetailVO> getProductionListByFactoryDetail(int pd_num) {
+		// TODO Auto-generated method stub
+		return projectDAO.getProductionListByFactoryDetail(pd_num);
+	}
+
+	public int getFindRecipeNum(String product_name) {
+		// TODO Auto-generated method stub
+		return projectDAO.getFindRecipeNum(product_name);
+	}
+
+	public List<InventoryVO> getFindInvenList(String product_name) {
+		// TODO Auto-generated method stub
+		return projectDAO.getFindInvenList(product_name);
+	}
 		
 		
 		

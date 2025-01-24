@@ -8,9 +8,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@ToString
 @Getter
 @Setter
+@ToString
 @Alias("QcVO")
 public class QcVO {
 
@@ -36,8 +36,8 @@ public class QcVO {
 	private int qcq_num;	// 질문 번호
 	private String qcquest;	// 질문 내용 (중복)
 	
-	private String product_name; // 상품명 (추가함)
+	private String qc_item_name; // 상품명 (추가함)
 	
 	private List<QcVO> QcVoList;
-	
+	private int totalPass;
 }

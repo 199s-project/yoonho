@@ -185,66 +185,128 @@
 
 	<!-- 품질 관리 리스트 전체 select -->
 	<select id="getQcList" resultType="QcVO">
-		SELECT *
+		SELECT qc.*,
+				CASE
+				WHEN qc.qc_type = 'plan' THEN p.product_name
+				WHEN qc.qc_type = 'order' THEN m.material_name
+				END AS qc_item_name
 		FROM qc
-		ORDER BY qc_num DESC
+			LEFT JOIN product p ON qc.qc_item_num = p.product_num AND qc.qc_type = 'plan'
+			LEFT JOIN material m ON qc.qc_item_num = m.material_num AND qc.qc_type = 'order'
+		ORDER BY qc.qc_num DESC;		
+	</select>
+		
+	<!-- QC 리스트 중 검사 전 -->
+	<select id="getQcList0" resultType="QcVO">
+		SELECT qc.*,
+				CASE
+				WHEN qc.qc_type = 'plan' THEN p.product_name
+				WHEN qc.qc_type = 'order' THEN m.material_name
+				END AS qc_item_name
+		FROM qc
+			LEFT JOIN product p ON qc.qc_item_num = p.product_num AND qc.qc_type = 'plan'
+			LEFT JOIN material m ON qc.qc_item_num = m.material_num AND qc.qc_type = 'order'
+		WHERE qc.qc_stat = 0
+		ORDER BY qc.qc_num DESC;		
+	</select>
+		
+	<!-- QC 리스트 중 작성 중 -->
+	<select id="getQcList1" resultType="QcVO">
+		SELECT qc.*,
+				CASE
+				WHEN qc.qc_type = 'plan' THEN p.product_name
+				WHEN qc.qc_type = 'order' THEN m.material_name
+				END AS qc_item_name
+		FROM qc
+			LEFT JOIN product p ON qc.qc_item_num = p.product_num AND qc.qc_type = 'plan'
+			LEFT JOIN material m ON qc.qc_item_num = m.material_num AND qc.qc_type = 'order'
+		WHERE qc.qc_stat = 1
+		ORDER BY qc.qc_num DESC;
 	</select>
 	
+	<!-- QC 리스트 중 검사 완료 -->
+	<select id="getQcList2" resultType="QcVO">
+		SELECT qc.*,
+				CASE
+				WHEN qc.qc_type = 'plan' THEN p.product_name
+				WHEN qc.qc_type = 'order' THEN m.material_name
+				END AS qc_item_name
+		FROM qc
+			LEFT JOIN product p ON qc.qc_item_num = p.product_num AND qc.qc_type = 'plan'
+			LEFT JOIN material m ON qc.qc_item_num = m.material_num AND qc.qc_type = 'order'
+		WHERE qc.qc_stat = 2
+		ORDER BY qc.qc_num DESC;		
+	</select>	
+
 	<!-- QC 1건 기본 정보 가져오기 -->
-	<select id="getOneQc" parameterType="java.lang.Integer" resultType="QcVO">
+	<select id="getOneQc" parameterType="java.lang.Integer"
+		resultType="QcVO">
 		SELECT *
 		FROM qc
 		WHERE qc.qc_num = #{qc_num};
 	</select>
-	
+
 	<!-- 원자재 이름 가져오기 -->
-	<select id="getQcMName" parameterType="java.lang.Integer" resultType="String">
+	<select id="getQcMName" parameterType="java.lang.Integer"
+		resultType="String">
 		SELECT material_name
 		FROM qc
-		LEFT JOIN material m ON m.material_num = qc.qc_item_num
+		LEFT JOIN material m ON
+		m.material_num = qc.qc_item_num
 		WHERE qc.qc_num = #{qc_num}
 	</select>
-	
+
 	<!-- 제품 이름 가져오기 -->
-	<select id="getQcPName" parameterType="java.lang.Integer" resultType="String">
+	<select id="getQcPName" parameterType="java.lang.Integer"
+		resultType="String">
 		SELECT product_name
 		FROM qc
-		LEFT JOIN product p ON p.product_num = qc.qc_item_num
+		LEFT JOIN product p ON
+		p.product_num = qc.qc_item_num
 		WHERE qc.qc_num = #{qc_num}
 	</select>
-	
+
 	<!-- QC 1건 질문-응답 상세 정보 (질문 번호, 질문 내용, 부적격 수량) -->
-	<select id="getOneQcDetail" parameterType="java.lang.Integer" resultType="QcVO">
+	<select id="getOneQcDetail" parameterType="java.lang.Integer"
+		resultType="QcVO">
 		SELECT qq.qcq_num, qq.qcquest, qd.qc_fail_quan
 		FROM qc q
 		LEFT JOIN qc_quest qq ON q.qc_type = qq.qc_type
-		LEFT JOIN qc_detail qd ON qq.qcq_num = qd.qcq_num and q.qc_num = qd.qc_num
-		WHERE q.qc_num = #{qc_num};
+		LEFT JOIN qc_detail qd
+		ON qq.qcq_num = qd.qcq_num and q.qc_num = qd.qc_num
+		WHERE q.qc_num =
+		#{qc_num};
 	</select>
-	
+
 	<!-- QC 1건 부적격 총 수량 -->
-	<select id="getTotalFail" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	<select id="getTotalFail" parameterType="java.lang.Integer"
+		resultType="java.lang.Integer">
 		SELECT COALESCE(SUM(qd.qc_fail_quan), 0)
 		FROM qc q
-		LEFT JOIN qc_quest qq ON q.qc_type = qq.qc_type
-		LEFT JOIN qc_detail qd ON qq.qcq_num = qd.qcq_num AND qd.qc_num = q.qc_num
-		WHERE q.qc_num= #{qc_num};
+		LEFT JOIN
+		qc_quest qq ON q.qc_type = qq.qc_type
+		LEFT JOIN qc_detail qd ON
+		qq.qcq_num = qd.qcq_num AND qd.qc_num = q.qc_num
+		WHERE q.qc_num=
+		#{qc_num};
 	</select>
-	
+
 	<!-- QC Detail 기존 값 존재 확인 -->
 	<select id="isQcDetail" parameterType="QcDetailVO">
 		SELECT EXISTS
-			(SELECT qcd_num
-			FROM qc_detail
-			WHERE qc_num = #{qc_num} and qcq_num = #{qcq_num})
+		(SELECT qcd_num
+		FROM qc_detail
+		WHERE qc_num = #{qc_num} and qcq_num = #{qcq_num})
 	</select>
-	
+
 	<!-- (기존 값 없음) QC 저장 버튼, 수량 추가 -->
 	<insert id="insertQcDetail" parameterType="QcDetailVO">
-		INSERT INTO qc_detail(qc_num, qcq_num, qc_fail_quan)
-		VALUES (#{qc_num}, #{qcq_num}, #{qc_fail_quan})
+		INSERT INTO
+		qc_detail(qc_num, qcq_num, qc_fail_quan)
+		VALUES (#{qc_num}, #{qcq_num},
+		#{qc_fail_quan})
 	</insert>
-	
+
 	<!-- (기존 값 있음) QC 저장 버튼, 수량 업데이트 -->
 	<update id="updateQcDetail" parameterType="QcDetailVO">
 		UPDATE qc_detail
@@ -252,7 +314,7 @@
 		qc_fail_quan = #{qc_fail_quan}
 		WHERE qc_num = #{qc_num} AND qcq_num = #{qcq_num};
 	</update>
-	
+
 	<!-- QC 저장 버튼, 상태 : 검사 중 (1) -->
 	<update id="updateQcStat1" parameterType="int">
 		UPDATE qc
@@ -260,26 +322,59 @@
 		qc_date = now(), qc_stat = 1
 		WHERE qc_num = #{qc_num}
 	</update>
-	
+
 	<!-- QC 제출 버튼, 상태 : 검사 완료 (2) -->
 	<update id="updateQcStat2" parameterType="int">
 		UPDATE qc
 		SET
-			qc_date = now(),
-			qc_stat = 2
+		qc_date = now(),
+		qc_stat = 2
 		WHERE qc_num = #{qc_num}
 	</update>
-		
+
+	<!-- QC 제출 버튼, 제출자 session -->
+	<update id="updateQcTester" parameterType="QcVO">
+		UPDATE qc
+		SET
+		qc_tester = #{qc_tester}
+		WHERE qc_num = #{qc_num}
+	</update>
+
 	<!-- QC 제출, inventory 업데이트 -->
 	<insert id="updateInven" parameterType="InventoryVO">
-		UPDATE inventory
-		SET
-			inven_amount = inven_amount + #{inven_amount}
-		WHERE
-			inven_name = #{inven_name}
-			AND inven_item_num = #{inven_item_num}
-			AND inven_type = #{inven_type};
+		INSERT INTO inventory (inven_type, inven_item_num, inven_name, inven_amount)
+		VALUE (#{inven_type}, #{inven_item_num}, #{inven_name}, #{inven_amount})
+		ON DUPLICATE KEY UPDATE
+		inven_amount = inven_amount + #{inven_amount};
 	</insert>
+	
+	<!-- 원자재 문서 번호로 정보 찾아오기 -->
+	<select id="getOrderformByPapernum" resultType="OrderformVO" parameterType="int">
+		SELECT *
+		FROM orderform
+		WHERE orderform_num = #{paper_num};
+	</select>
+	
+	<!-- 원자재 번호로 가격 찾아오기 -->
+	<select id="getMaterialPrice" resultType="int" parameterType="int">
+		SELECT material_price
+		FROM material
+		WHERE material_num = #{inven_item_num};
+	</select>
+	
+	<!-- 생산 문서 번호로 정보 찾아오기 -->
+	<select id="getProductionByPapernum" resultType="productionVO" parameterType="int">
+		SELECT *
+		FROM production
+		WHERE pd_num = #{paper_num};
+	</select>
+	
+	<!-- 생산 문서 detail -->
+	<insert id="insertProductionDetail" parameterType="ProductionDetailVO">
+		INSERT INTO productiondetail(pd_num, product_name, productiondetail_amount)
+		VALUES (#{pd_num}, #{product_name}, #{productiondetail_amount});		
+	</insert>
+	
 <!-- 나현. 끝. -->
 	
 <!-- 김윤호 =========================================================김윤호================================ -->	
@@ -418,7 +513,58 @@
 		set inven_amount = inven_amount - #{inven_amount} where inven_name = #{inven_name}
 	</update>
 	
+	  <update id="setPdCheckUpdate" parameterType="ProductionVO"> 
+	update 	production
+	set pd_check = 1 where pd_num = #{pd_num}
+  </update>
+ 	   
+	<select id="getfindProductNum" parameterType="ProductVO" resultType="ProductVO">
+		SELECT 
+    	product.product_num FROM product
+		INNER JOIN productiondetail ON product.product_name = productiondetail.product_name
+		where productiondetail.product_name = #{product_name} LIMIT 1;
+	</select>
+	<!-- 윤호 가 짠거 -->
+	<select id="getInventoryByProductName" parameterType="InventoryVO">
+	select inven_amount from inventory where inven_name = #{product_name}
+	</select>
+	<!-- 김민성 버젼 -->
+	<select id="getTotalAmount" parameterType="RecipeDetailVO">
+	select material_name, material_amount from recipe,recipedetail where recipe.recipe_num = recipedetail.recipe_num and recipe.product_name = #{product_name};
+	</select>
 	
+	<select id="getInvenAmount" parameterType="InventoryVO">
+	select inven_amount from inventory where inven_type = 0 and inven_name = #{inven_name} ;
+	</select>
+	
+	<select id="getProductionVO" parameterType="ProductionVO" >
+		select * from production where pd_num = #{pd_num}
+	</select>
+	
+	<select id="getProductionDetail" parameterType="ProductionDetailVO" >
+		select * from productiondetail where pd_num = #{pd_num}
+	</select>
+	
+	
+	<select id="getRecipeDetailList" parameterType="RecipeDetailVO" >
+		select * from recipedetail
+	</select>
+	
+	<select id="getProductionListByFactoryDetail" parameterType="ProductionDetailVO">
+		select product_name , productiondetail_amount from productiondetail where
+		pd_num = #{pd_num};
+	</select>
+	
+	<select id="getFindRecipeNum" parameterType="String">
+		select recipe_num from recipe where product_name = #{product_name}	
+	</select>
+	
+	<select id="getFindInvenList" parameterType="ProductionDetailVO">
+		   SELECT * FROM inventory WHERE inven_name IN
+    	<foreach collection="ProductionList" item="product_name" open="(" separator="," close=")">
+      	  #{product_name}
+    	</foreach>
+	</select>
 	
 <!-- 김민성 ========================================================================================= -->	
 	
@@ -567,6 +713,71 @@
 	    INSERT INTO inventory (inven_type, inven_item_num, inven_name, inven_amount, inven_price)
 	    VALUES (1, #{inven_item_num}, #{inven_name}, 0, 0);
 	</insert>
+	
+		<select id="productNameCheck" parameterType="String" resultType="java.lang.Integer">
+		select count(*) from product where product_name = #{product_name}
+	</select>
+	
+	<select id="getProductCodeAndNameListConcat" resultType="String">
+		select concat(product_code, '(', product_name, ')') AS product_code
+		from product
+	</select>
+	
+	<insert id="insertRecipe" parameterType="RecipeVO">
+	    INSERT INTO recipe (product_name, product_code, recipe_price)
+	    VALUES (#{product_name}, #{product_code}, #{recipe_price});
+	</insert>
+	
+	<select id="getLastRecipeNum" resultType="int">
+		select *
+		from recipe
+		order by recipe_num desc
+		limit 1;
+	</select>
+	
+	<insert id="insertRecipeDetail" parameterType="RecipeDetailVO">
+	    INSERT INTO recipedetail (recipe_num, product_num, material_name, material_amount, material_price)
+	    VALUES (#{recipe_num}, #{product_num}, #{material_name}, #{material_amount}, 0);
+	</insert>
+	
+	<select id="recipeProductCodeCheck" parameterType="String" resultType="int">
+		select count(*) from recipe where product_code = #{product_code}
+	</select>
+	
+	<select id="getRecipeList" resultType="RecipeVO">
+		select * from Recipe
+	</select>
+	
+	<select id="getProductNumByProductCode" parameterType="String">
+		select product_num from product where product_code = #{product_code}
+	</select>
+	
+	<select id="getRecipeDetailByProductNum" resultType="RecipeDetailVO">
+		select * from recipedetail where product_num = #{product_num}	
+	</select>
+	
+	<select id="getRecipeByRecipeNum" resultType="RecipeVo">
+		select * from recipe where recipe_num = #{recipe_num}	
+	</select>
+	
+	<update id="updateRecipe" parameterType="RecipeVO">
+		update recipe
+		set	recipe_price = #{recipe_price}
+		where recipe_num = #{recipe_num}
+	</update>
+	
+	<update id="updateRecipeDetail" parameterType="RecipeDetailVO">
+		update recipedetail
+		set	material_name = #{material_name}, material_amount = #{material_amount}
+		where rd_num = #{rd_num}
+	</update>
+	
+	<update id="updateOrderformFinish" parameterType="int">
+		update orderform
+		set orderform_stat = "완료"
+		where orderform_num = #{orderform_num}
+	</update>
+	
 	
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@new 작업공간@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 이의재  끝 -->
 

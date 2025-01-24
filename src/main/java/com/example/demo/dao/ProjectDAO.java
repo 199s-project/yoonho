@@ -22,6 +22,7 @@ import com.example.demo.dto.QcVO;
 import com.example.demo.dto.QuotationDetailVO;
 import com.example.demo.dto.QuotationVO;
 import com.example.demo.dto.RecipeDetailVO;
+import com.example.demo.dto.RecipeVO;
 
 @Mapper
 public interface ProjectDAO {
@@ -79,6 +80,15 @@ public interface ProjectDAO {
 	// QC 전체 리스트
 	List<QcVO> getQcList();
 	
+	// QC 리스트 : 검사 전 0
+	List<QcVO> getQcList0();
+	
+	// QC 리스트 : 작성 중 1
+	List<QcVO> getQcList1();
+	
+	// QC 리스트 : 작성 중 2
+	List<QcVO> getQcList2();
+	
 	// QC 1건 기본 정보
 	QcVO getOneQc(int qc_num);
 	
@@ -111,6 +121,25 @@ public interface ProjectDAO {
 	
 	// QC 제출 버튼, inventory 수량 증가
 	int updateInven(InventoryVO inven);
+	
+	// QC 제출 버튼, 제출자 session
+	int updateQcTester(QcVO qc);
+	
+	// 원자재 문서 번호로 정보 찾아오기
+	OrderformVO getOrderformByPapernum(int paper_num);
+	
+	// 원자재 번호로 가격 찾아오기
+	int getMaterialPrice(int inven_item_num);
+	
+	ProductionVO getProductionByPapernum(int paper_num);
+	
+	// 박나현이 김민성 부분 합치다가 추가한 것. 시작 -----------------------------------------------
+	
+	int setPdCheckUpdate(ProductionVO productionVO);
+	
+	ProductVO getfindProductNum(ProductVO productVO);
+	
+	// 박나현이 김민성 부분 합치다가 추가한 것. 끝 -----------------------------------------------
 	
 	// 나현. 끝.
 
@@ -169,9 +198,23 @@ public interface ProjectDAO {
 	
 	int reduceInventoryAmount(InventoryVO inventoryVO);
 	
+	int insertProductionDetail(ProductionDetailVO pdd);
 	
-	
-	
+	InventoryVO getInventoryByProductName(String product_name);
+
+	List<RecipeDetailVO> getTotalAmount(String product_name);
+
+	List<ProductionDetailVO> getProductionDetail(int pd_num);
+
+	List<RecipeDetailVO> getRecipeDetailList();
+
+	InventoryVO getInvenAmount(String Mname);
+
+	List<ProductionDetailVO> getProductionListByFactoryDetail(int pd_num);
+
+	int getFindRecipeNum(String product_name);
+
+	List<InventoryVO> getFindInvenList(String product_name);
 	
 	// ---------------------김민성---------------------------------	
 	
@@ -222,8 +265,6 @@ public interface ProjectDAO {
    
    MaterialVO getMaterialByMaterialName(String product_name);  
    
-   int insertInventoryMaterial (PaymentMaterialVO inventoryMaterialVO);
-   
    int insertqc (QcVO qcVO);
    
    List<MemberVO> getMemberList();
@@ -237,6 +278,32 @@ public interface ProjectDAO {
    int addMaterialInventory(InventoryVO inventoryVO);
    
    int addProductInventory(InventoryVO inventoryVO);
+   
+   int productNameCheck(String product_name);
+   
+   String[] getProductCodeAndNameListConcat();
+   
+   int insertRecipe(RecipeVO recipeVO);
+   
+   int getLastRecipeNum();
+   
+   int insertRecipeDetail(RecipeDetailVO recipeDetailVO);
+   
+   int recipeProductCodeCheck(String product_code);
+   
+   List<RecipeVO> getRecipeList();
+   
+   int getProductNumByProductCode(String product_code);
+   
+   List<RecipeDetailVO> getRecipeDetailByProductNum(int product_num);
+   
+   RecipeVO getRecipeByRecipeNum(int recipe_num);
+   
+   int updateRecipe(RecipeVO recipeVO);
+   
+   int updateRecipeDetail(RecipeDetailVO recipeDetailVO);
+   
+   int updateOrderformFinish (int orderform_num);
    
 // new 작업공간 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 이의재 끝   
    

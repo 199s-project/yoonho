@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<title>직원 목록</title>
+<title>레시피 목록</title>
 <head>
 
    
@@ -26,10 +26,9 @@ table.multiple-select-row {
 	margin-left: 2%;
 	
     th, td {
-    	text-align: center;
 	    border: 1px solid #ddd !important; /* 얇은 테두리 설정 */
 	    padding: 8px; /* 셀 내부 간격 */
-	    text-align: left; /* 텍스트 정렬 */
+	    text-align: center; /* 텍스트 정렬 */
 	    height: 37px;
 	}
 	
@@ -124,6 +123,11 @@ table.multiple-select-row {
 		float: left;
 		margin-left: 18px;
 	}
+	.material-name-input, .material-amount-input {
+		width: 44%;
+		float: left;
+		margin-left: 18px;
+	}
 	.code-validation-result, .company-validation-result, .company-name-validation-result, .company-code-validation-result {
 		width: 44%;
 		float: right;
@@ -146,7 +150,7 @@ table.multiple-select-row {
 	margin: 0.75em 0 0 0 !important;
 }
 
-.btn-member {
+.btn-recipe {
 	text-align:center;
 	font-weight: 500;
 	padding: 3px 15px;
@@ -157,6 +161,12 @@ table.multiple-select-row {
 	outline:none;
 }
 
+	.ui-menu {
+		z-index: 2000 !important;
+		max-height: 130px !important;
+		overflow-y: auto !important;
+		overflow-x: hidden !important;
+	}
 
 </style>
 
@@ -186,49 +196,115 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 <script>
 
 
-
-
-
-async function updateMember(member_id) {
+async function recipeDetail(event) {
+	const button = event.target;
+	const row = button.closest('tr');
+	const productCodeElement = row.querySelector('.product-code');
+	const product_code = productCodeElement?.textContent.trim();
 	
-	const response = await fetch(`/getMemberByMemberId?member_id=${member_id}`);
-	const member = await response.json();
+	//이미 상세 정보 행이 있는지 확인
+	const existingDetailRow = row.nextElementSibling;
+	if (existingDetailRow && existingDetailRow.classList.contains('detail-row')) {
+		// 상세 정보가 이미 있으면 제거
+		existingDetailRow.remove();
+		return;
+	}
+	
+	//레시피 정보 가져오기
+	const response = await fetch(`/getRecipeDetailByProductcode?product_code=${product_code}`);
+	const RecipeDetailList = await response.json();
+	
+	// 새로운 행 생성
+	const detailRow = document.createElement('tr');
+	detailRow.classList.add('detail-row');
+	
+	
+	
+	let detailHTML = `
+	    <td colspan="6" style="text-align: center; padding: 10px;">
+	    <div style="display: flex; justify-content: center; padding: 20px;">
+        <table style="width: 50%; border: 1px solid #ccc; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #f5f5f5;">
+                    <th style="width: 200px; height: 15px; border: 1px solid #ccc; padding: 8px;">원재료 이름</th>
+                    <th style="width: 200px; height: 15px; border: 1px solid #ccc; padding: 8px;">필요 수량</th>
+                </tr>
+            </thead>
+            <tbody>
+	`;
+	
+	RecipeDetailList.forEach(recipeDetailVO => {
+		detailHTML += `
+			<tr>
+	            <td style="width: 200px; height: 15px; border: 1px solid #ccc; padding: 8px;">${recipeDetailVO.material_name}</td>
+	            <td style="width: 200px; height: 15px; border: 1px solid #ccc; padding: 8px;">${recipeDetailVO.material_amount}</td>
+	        </tr>
+		`;
+	});
+	
+	detailHTML += `
+        	</tbody>
+        </table>
+        </div>
+    </td>
+	`;
+                
+	
+	detailRow.innerHTML = detailHTML;
+	
+	row.insertAdjacentElement('afterend', detailRow);
+}
+
+
+
+
+async function updateRecipe(recipe_num) {
+	
+	const recipeVOResponse = await fetch(`/getRecipeByRecipeNum?recipe_num=${recipe_num}`);
+	const recipeVO = await recipeVOResponse.json();
+
+	const recipeDetailVOListResponse = await fetch(`/getRecipeDetailListByRecipeNum?recipe_num=${recipe_num}`);
+	const recipeDetailVOList = await recipeDetailVOListResponse.json();
+	console.log(recipeDetailVOList);
+	
+	let detailHTML = ``;
+	let count = 1;
+	recipeDetailVOList.forEach(recipeDetailVO => {
+		detailHTML += `
+			<tr>
+				<td class="heading-td"> 레시피${count} </td>
+				<td><input type="text" id="material-name-input` + count + `" class="swal2-input material-name-input" value="${recipeDetailVO.material_name}" onblur="rowmaterialChange(event)" autocomplete="off" required>
+					<input type="text" id="material-amount-input` + count + `" class="swal2-input material-amount-input" placeholder="레시피 수량" value="${recipeDetailVO.material_amount}" autocomplete="off" required>
+					<input type="hidden" id="recipedetail-num` + count + `" value="${recipeDetailVO.rd_num}">
+				</td>
+			</tr>
+		`;
+		count++;
+	});
 	
 	Swal.fire({
 		html: `
 			<table id="register-table" class="input-auto-size">
 	  			<thead>
 	  				<tr>
-	  					<td colspan="2" style="text-align:left"> <div class="table-title"><i class="fa-solid fa-users"></i> &nbsp; 직원 정보 수정</div> </td>
+	  					<td colspan="2" style="text-align:left"> <div class="table-title"><i class="fa-solid fa-users"></i> &nbsp; 레시피 정보 수정</div> </td>
 	  				</tr>
 	  			</thead>
 	  			<tbody>
 	  				<tr>
-	  					<td class="heading-td"> 아이디 </td>
-	  					<td> <input id="company-input1" class="swal2-input" value="${member.member_id}" placeholder="아이디" oninput="company_nameValidation()"> <input id="company-name-validation-result" class="swal2-input company-name-validation-result" readonly placeholder="중복여부"> </td>
+	  					<td class="heading-td"> 제품코드 </td>
+	  					<td> <input id="recipe-input1" class="swal2-input" value="${recipeVO.product_code}" placeholder="아이디" readonly></td>
 	  				</tr>
 	  				<tr>
-	  					<td class="heading-td"> 이름 </td>
-	  					<td> <input id="company-input2" class="swal2-input" value="${member.member_name}" placeholder="이름"> </td>
+	  					<td class="heading-td"> 제품명 </td>
+	  					<td> <input id="recipe-input2" class="swal2-input" value="${recipeVO.product_name}" placeholder="이름" readonly></td>
 	  				</tr>	  					
 	  				<tr>
-	  					<td class="heading-td"> 이메일 </td>
-	  					<td> <input id="company-input3" class="swal2-input" value="${member.member_email}" placeholder="이메일"> </td>
+	  					<td class="heading-td"> 생산단가 </td>
+	  					<td> <input id="recipe-input3" class="swal2-input" value="${recipeVO.recipe_price}" placeholder="생산단가"> 
+	  						 <input type="hidden" id="recipe-input4" value="${recipeVO.recipe_num}" /></td>
 	  				</tr>
-	  				<tr>
-	  					<td class="heading-td"> 연락처 </td>
-	  					<td> <input id="company-input4" class="swal2-input" value="${member.member_phone}" placeholder="연락처"> </td>
-	  				</tr>
-	  				<tr>
-	  					<td class="heading-td"> 직급 </td>
-	  					<td> <input id="company-input5" class="swal2-input" value="${member.member_grade}" placeholder="직급"> </td>
-	  				</tr>
-	  				<tr>
-	  					<td class="heading-td"> 부서 </td>
-	  					<td> <input id="company-input6" class="swal2-input" value="${member.member_dept}" placeholder="부서"> </td>
-	  						 <input type="hidden" id="company-input7" class="swal2-input" value="${member.member_num}" />
-	  						 <input type="hidden" id="company-input8" class="swal2-input" value="${member.member_pwd}" />
-	  				</tr>
+	  					${detailHTML}
 	  			</tbody>
 	  		</table>
 	    `,
@@ -240,38 +316,32 @@ async function updateMember(member_id) {
 	    allowOutsideClick: false,
 	    focusConfirm: false,
 	    preConfirm: () => {
-	        const num = document.getElementById("company-input7").value;
-			const id = document.getElementById("company-input1").value;
-			const pwd = document.getElementById("company-input8").value;
-			const name = document.getElementById("company-input2").value;
-			const email = document.getElementById("company-input3").value;
-			const phone = document.getElementById("company-input4").value;
-			const grade = document.getElementById("company-input5").value;
-			const dept = document.getElementById("company-input6").value;
-			const val1 = document.getElementById("company-name-validation-result").value;
-	      
-			if (!id || !pwd || !name || !email || !phone || !grade || !dept || !val1) {
-				Swal.showValidationMessage("모든 입력란을 채워주세요!");
-				return false;
-			}
-			if (val1 == "사용불가") {
-				Swal.showValidationMessage("이미 존재하는 아이디입니다!");
-				return false;
-			}
-			return { 
-				member_num: num,
-				member_id: id,
-				member_pwd: pwd,
-				member_name: name, 
-				member_email: email, 
-				member_phone: phone, 
-				member_grade: grade, 
-				member_dept: dept
-			};
+	        const formElements = document.querySelectorAll('#register-table input');
+	        const formData = new Map();
+			let isValid = true;
+	        
+	        formElements.forEach(input => {
+	        	const value = input.value.trim(); // 값 확인
+	        	if (!value && input.required) { // 값이 없는 경우
+	        		isValid = false;
+	        		input.style.borderColor = "red"; // 경고
+	        		input.focus(); // 필드로 포커스 변경
+	        	} else {
+	        		input.style.borderColor = ""; // 경고제거
+	        		formData.set(input.id, value);
+	        	}
+	        });
+	        
+	        if (!isValid) {
+	        	Swal.showValidationMessage("입력란을 채워주세요.")
+	        	return false;
+	        }
+	        
+			return Object.fromEntries(formData);
 		}
 	}).then((result) => {
 		if (result.isConfirmed) {
-			fetch('/updateMember', {
+			fetch('/updateRecipe', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -280,9 +350,9 @@ async function updateMember(member_id) {
 			})
 			.then(response => {
 				if (response.ok) {
-					Swal.fire("성공", "멤버 정보가 성공적으로 수정되었습니다.", "success");
+					Swal.fire("성공", "레시피 정보가 성공적으로 수정되었습니다.", "success");
 				} else {
-					Swal.fire("실패", "멤버 정보를 수정하지 못했습니다.", "error");
+					Swal.fire("실패", "레시피 정보를 수정하지 못했습니다.", "error");
 				}
 			})
 			.catch(error => {
@@ -298,58 +368,58 @@ async function updateMember(member_id) {
 
 <script>
 
-function company_nameValidation() {
-	var company_name = $("#company-input1").val();
-	var member_num = $("#company-input7").val();
-	if (!company_name) {
-		$('.company-name-validation-result').attr('value', '');
-	} else {
-		$.ajax({
-			type: "POST",
-			url: "/memberIdValidation",
-			data: {member_id : company_name, member_num : member_num},
-			success: function(cnt) {
-				if (cnt > 0) {
-					$('.company-name-validation-result').attr('value', '사용불가');
-					$('.company-name-validation-result').css({
-						"color" : "red",
-					});
-				} else {
-					$('.company-name-validation-result').attr('value', '사용가능');
-					$('.company-name-validation-result').css({
-						"color" : "green",
-					});
-				}
-			}
-		});
+function rowmaterialChange(event) {
+	const currentInput = event.target;
+	const currentId = currentInput.id;
+	const currentValue = currentInput.value.trim();
+	const allInputs = document.querySelectorAll('.material-name-input');
+	
+	const k = currentId.replace('material-name-input', '');
+	const materialAmountInput = document.getElementById(`material-amount-input${k}`);
+	
+	let isDuplicate = false;
+	allInputs.forEach(input => {
+		if (input !== currentInput && input.value.trim() === currentValue) {
+			isDuplicate = true;
+		}
+	});
+	
+	if (isDuplicate) {
+		alert('이미 동일한 값이 입력되어 있습니다.');
+		currentInput.value= '';
+		if (materialAmountInput) materialAmountInput.value = '';
 	}
 }
 
-function company_codeValidation() {
-	var company_code = $("#company-input2").val();
-	if (!company_code) {
-		$('.company-code-validation-result').attr('value', '');
-	} else {
-		$.ajax({
-			type: "POST",
-			url: "/companyCodeValidation",
-			data: {company_code : company_code},
-			success: function(cnt) {
-				if (cnt > 0) {
-					$('.company-code-validation-result').attr('value', '사용불가');
-					$('.company-code-validation-result').css({
-						"color" : "red",
-					});
-				} else {
-					$('.company-code-validation-result').attr('value', '사용가능');
-					$('.company-code-validation-result').css({
-						"color" : "green",
-					});
-				}
-			}
-		});
-	}
-}
+$(document).on("focus", ".material-name-input", function() {
+	const $this = $(this);
+	$.ajax({
+		url: "/getMaterialNameList",
+		type: "POST",
+		dataType: "json",
+		success: function(data) {
+			$this.autocomplete({
+				source: data,
+				minLength: 0,	
+				select: function(event, ui) {
+					$this.val(ui.item.value);
+					return false;
+				},
+				position: {
+					my: "left top",
+					at: "left bottom",
+					of: $this,
+				},	
+			});
+			
+			$this.autocomplete("search", "");
+			
+		},
+		error: function (xhr, status, error) {
+			console.error("에러: ", error);
+		},
+	});
+});
 
 </script>
 
@@ -373,7 +443,7 @@ function company_codeValidation() {
                      <nav aria-label="breadcrumb" role="navigation">
                         <ol class="breadcrumb">
                            <li class="breadcrumb-item"><a href="index">Home</a></li>
-                           <li class="breadcrumb-item active" aria-current="page">직원 목록</li>
+                           <li class="breadcrumb-item active" aria-current="page">레시피 목록</li>
                         </ol>
                      </nav>
                   </div>
@@ -400,29 +470,27 @@ function company_codeValidation() {
 								<tr style="text-align: center;">
 									<td class="hidden_row"></td>
 									<th class="table-plus datatable-nosort" width="4%">번호</th>
-									<th style="width: 15%;">아이디</th>
-									<th style="width: 15%;">이름</th>
-									<th>이메일</th>
-									<th>연락처</th>
-									<th style="width: 9%;">직급</th>
-									<th style="width: 9%;">부서</th>
-									<th style="width: 9%;">수정</th>
+									<th style="width: 20%;">제품명</th>
+									<th style="width: 20%;">제품코드</th>
+									<th width="10%">생산단가</th>
+									<th width="10%">레시피보기</th>
+									<th width="5%">수정</th>
 								</tr>
 							</thead>
 							<tbody>
-									<th:block th:each="form,stat: ${memberListVO}">
+									<th:block th:each="form,stat: ${recipeVOList}">
 										<tr>
 											<td class="hidden_row"></td>
 											<td style="text-align: center;"><th:block th:text="${stat.size-stat.index}"></th:block></td>  
-											<td><th:block th:text="${form.member_id}"></th:block></td>
-											<td><th:block th:text="${form.member_name}"></th:block></td>
-											<td><th:block th:text="${form.member_email}"></th:block></td>
-											<td><th:block th:text="${form.member_phone}"></th:block></td>
-											<td><th:block th:text="${form.member_grade}"></th:block></td>
-											<td><th:block th:text="${form.member_dept}"></th:block></td>
+											<td><th:block th:text="${form.product_name}"></th:block></td>
+											<td class="product-code"><th:block th:text="${form.product_code}"></th:block></td>
+											<td><th:block th:text="${form.recipe_price}"></th:block></td>
+											<td><button type="button" th:text="'레시피보기'" 
+												 onclick="recipeDetail(event)"
+												style="cursor:pointer;" class="btn-recipe"></button></td>
 											<td><button type="button" th:text="'수정'" 
-												th:onclick="updateMember([[${form.member_id}]])" 
-												style="cursor:pointer;" class="btn-member"></button></td>
+												 th:onclick="updateRecipe([[${form.recipe_num}]])"
+												style="cursor:pointer;" class="btn-recipe"></button></td>
 										</tr>
 									</th:block>
 							</tbody>
@@ -467,6 +535,9 @@ function company_codeValidation() {
    <script src="src/plugins/datatables/js/vfs_fonts.js"></script>
    <!-- Datatable Setting js -->
    <script src="vendors/scripts/datatable-setting.js"></script>
+   
+   	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
    
 
    

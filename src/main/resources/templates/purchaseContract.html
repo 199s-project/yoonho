@@ -67,6 +67,49 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 
 </style>
 
+<script>
+function orderformProceed(orderform_num) {
+	Swal.fire({
+		title: "Are you sure?",
+		text: "You won't be able to revert this!",
+		icon: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#3085d6",
+		cancelButtonColor: "#d33",
+		confirmButtonText: "입고",
+		preconfirm:() => {
+			return {
+				orderform_num : orderform_num
+			}
+		}
+	}).then((result) => {
+		if (result.isConfirmed) {
+			$.ajax({
+				type: "POST",
+				url: "/orderformProceed",
+				data: {orderform_num : orderform_num},
+				success: function(cnt) {
+					if (cnt == 0) {
+						Swal.fire("실패", "오류가 발생했습니다.", "error");
+					} else {
+						Swal.fire("성공", "정상적으로 입고처리 되었습니다.", "success")
+						.then(result => {
+							location.reload();
+						});
+					}
+				}
+			});
+		} else {
+			Swal.fire("실패", "오류가 발생했습니다.", "error");
+		}
+		
+	});
+}
+
+
+</script>
+
+
 
 </head>
 <body>
@@ -137,7 +180,15 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 											<td><th:block th:text="${form.company_num2}"></th:block></td>
 											<td><th:block th:text="${form.orderform_startDate}"></th:block></td>
 											<td><th:block th:text="${form.orderform_endDate}"></th:block></td>
-											<td><th:block th:text="${form.orderform_stat}"></th:block></td>
+											<td>
+												<span th:if="${form.orderform_stat == '진행중'}" 
+													  th:text="입고" th:onclick="orderformProceed([[${form.orderform_num}]])" 
+													  style="cursor:pointer;">
+												</span>
+												<span th:unless="${form.orderform_stat == '진행중'}"
+													  th:text="'완료'">
+												</span>
+											</td>
 										</tr>
 									</th:block>
 							</tbody>

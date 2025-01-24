@@ -275,15 +275,6 @@
       <div class="menu-block customscroll">
          <div class="sidebar-menu">
             <ul id="accordion-menu">
-               <li class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-house-1"></span><span class="mtext">Home</span>
-                  </a>
-                  <ul class="submenu">
-                     <li><a href="index">Dashboard style 1</a></li>
-                     <li><a href="index2">Dashboard style 2</a></li>
-                  </ul>
-               </li>
                
                <li class="dropdown">
                   <a href="javascript:;" class="dropdown-toggle">
@@ -328,6 +319,7 @@
                      <li><a href="getQuotationRegister">판매계약서 등록</a></li>
                      <li><a href="getMaterialRegister">원자재 등록</a></li>
                      <li><a href="getRecipeRegister">레시피 등록</a></li>
+                     <li><a href="recipe">레시피 리스트</a></li>
                      <li><a href="Material">원자재 리스트</a></li>
                      <li><a href="member">직원 리스트</a></li>
                      <li><a href="login">로그인</a></li>
@@ -340,162 +332,70 @@
                   </a>
                   <ul class="submenu">
                      <li><a href="qc">qc.html</a></li>
-                     <li><a href="qcDetail">qcDetail.html</a></li>
                      <li><a href="qcTypeReg">qcTypeReg.html</a></li>
-                     <li><a href="qcTest">qcTest.html</a></li>
                   </ul>
                </li>
                
                <li class="dropdown">
                   <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-edit2"></span><span class="mtext">Forms</span>
+                     <span class="micon dw dw-house-1"></span><span class="mtext">Home</span>
                   </a>
                   <ul class="submenu">
-                     <li><a href="form-basic">Form Basic</a></li>
-                     <li><a href="advanced-components">Advanced Components</a></li>
-                     <li><a href="form-wizard">Form Wizard</a></li>
-                     <li><a href="html5-editor">HTML5 Editor</a></li>
-                     <li><a href="form-pickers">Form Pickers</a></li>
-                     <li><a href="image-cropper">Image Cropper</a></li>
-                     <li><a href="image-dropzone">Image Dropzone</a></li>
+                     <li><a href="index">대시보드</a></li>
+                     <li><a href="login">로그인/로그아웃</a></li>
                   </ul>
                </li>
-               <li class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-library"></span><span class="mtext">Tables</span>
-                  </a>
-                  <ul class="submenu">
-                     <li><a href="basic-table">Basic Tables</a></li>
-                     <li><a href="datatable">DataTables</a></li>
-                  </ul>
-               </li>
+               
                <li>
-                  <a href="calendar" class="dropdown-toggle no-arrow">
-                     <span class="micon dw dw-calendar1"></span><span class="mtext">Calendar</span>
-                  </a>
+               	<a href="allForm" class="dropdown-toggle no-arrow">
+               		<span class="micon dw dw-invoice-1"></span><span>계약서 관리</span>
+               	</a>
                </li>
+               
                <li class="dropdown">
                   <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-apartment"></span><span class="mtext"> UI Elements </span>
+                     <span class="micon dw dw-shopping-cart"></span><span class="mtext">구매/판매</span>
                   </a>
                   <ul class="submenu">
-                     <li><a href="ui-buttons">Buttons</a></li>
-                     <li><a href="ui-cards">Cards</a></li>
-                     <li><a href="ui-cards-hover">Cards Hover</a></li>
-                     <li><a href="ui-modals">Modals</a></li>
-                     <li><a href="ui-tabs">Tabs</a></li>
-                     <li><a href="ui-tooltip-popover">Tooltip &amp; Popover</a></li>
-                     <li><a href="ui-sweet-alert">Sweet Alert</a></li>
-                     <li><a href="ui-notification">Notification</a></li>
-                     <li><a href="ui-timeline">Timeline</a></li>
-                     <li><a href="ui-progressbar">Progressbar</a></li>
-                     <li><a href="ui-typography">Typography</a></li>
-                     <li><a href="ui-list-group">List group</a></li>
-                     <li><a href="ui-range-slider">Range slider</a></li>
-                     <li><a href="ui-carousel">Carousel</a></li>
+                     <li><a href="purchaseContract">구매 계약서</a></li>
+                     <li><a href="getOrderformRegister">구매 계약서 작성</a></li>
+                     <li><a href="salesContract">판매 계약서</a></li>
+                     <li><a href="getQuotationRegister">판매 계약서 작성</a></li>
+                  </ul>
+               </li>
+            	<li class="dropdown">
+                  <a href="javascript:;" class="dropdown-toggle">
+                     <span class="micon dw dw-factory"></span><span class="mtext">생산 관리</span>
+                  </a>
+                  <ul class="submenu">
+                     <li><a href="productionPlan">생산 계약서</a></li>
+                     <li><a href="productionForm">생산 계획서 작성</a></li>
+                     <li><a href="qc">품질 관리</a></li>
+                 	 <li><a href="cost">원가 관리</a></li>
                   </ul>
                </li>
                <li class="dropdown">
                   <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-paint-brush"></span><span class="mtext">Icons</span>
+                     <span class="micon dw dw-inbox"></span><span class="mtext">재고 관리</span>
                   </a>
                   <ul class="submenu">
-                     <li><a href="font-awesome">FontAwesome Icons</a></li>
-                     <li><a href="foundation">Foundation Icons</a></li>
-                     <li><a href="ionicons">Ionicons Icons</a></li>
-                     <li><a href="themify">Themify Icons</a></li>
-                     <li><a href="custom-icon">Custom Icons</a></li>
+                 	 <li><a href="inventory">재고 현황</a></li>                 	 
                   </ul>
                </li>
-               <li class="dropdown">
+              
+               <li class="project">
                   <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-analytics-21"></span><span class="mtext">Charts</span>
+                     <span class="micon dw dw-id-card"></span><span class="mtext">기초 등록</span>
                   </a>
                   <ul class="submenu">
-                     <li><a href="highchart">Highchart</a></li>
-                     <li><a href="knob-chart">jQuery Knob</a></li>
-                     <li><a href="jvectormap">jvectormap</a></li>
-                     <li><a href="apexcharts">Apexcharts</a></li>
+                     <li><a href="company">협력사</a></li>
+                     <li><a href="product">제품</a></li>
+                     <li><a href="Material">원자재</a></li>
+                     <li><a href="getRecipeRegister">레시피 BOM</a></li>
+                     <li><a href="member">직원</a></li>
                   </ul>
                </li>
-               <li class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-right-arrow1"></span><span class="mtext">Additional Pages</span>
-                  </a>
-                  <ul class="submenu">
-                     <li><a href="video-player">Video Player</a></li>
-                     <li><a href="login">Login</a></li>
-                     <li><a href="forgot-password">Forgot Password</a></li>
-                     <li><a href="reset-password">Reset Password</a></li>
-                  </ul>
-               </li>
-               <li class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-browser2"></span><span class="mtext">Error Pages</span>
-                  </a>
-                  <ul class="submenu">
-                     <li><a href="400.html">400</a></li>
-                     <li><a href="403.html">403</a></li>
-                     <li><a href="404.html">404</a></li>
-                     <li><a href="500.html">500</a></li>
-                     <li><a href="503.html">503</a></li>
-                  </ul>
-               </li>
-
-               <li class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-copy"></span><span class="mtext">Extra Pages</span>
-                  </a>
-                  <ul class="submenu">
-                     <li><a href="blank">Blank</a></li>
-                     <li><a href="contact-directory">Contact Directory</a></li>
-                     <li><a href="blog">Blog</a></li>
-                     <li><a href="blog-detail">Blog Detail</a></li>
-                     <li><a href="product">Product</a></li>
-                     <li><a href="product-detail">Product Detail</a></li>
-                     <li><a href="faq">FAQ</a></li>
-                     <li><a href="profile">Profile</a></li>
-                     <li><a href="gallery">Gallery</a></li>
-                     <li><a href="pricing-table">Pricing Tables</a></li>
-                  </ul>
-               </li>
-               <li class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle">
-                     <span class="micon dw dw-list3"></span><span class="mtext">Multi Level Menu</span>
-                  </a>
-                  <ul class="submenu">
-                     <li><a href="javascript:;">Level 1</a></li>
-                     <li><a href="javascript:;">Level 1</a></li>
-                     <li><a href="javascript:;">Level 1</a></li>
-                     <li class="dropdown">
-                        <a href="javascript:;" class="dropdown-toggle">
-                           <span class="micon fa fa-plug"></span><span class="mtext">Level 2</span>
-                        </a>
-                        <ul class="submenu child">
-                           <li><a href="javascript:;">Level 2</a></li>
-                           <li><a href="javascript:;">Level 2</a></li>
-                        </ul>
-                     </li>
-                     <li><a href="javascript:;">Level 1</a></li>
-                     <li><a href="javascript:;">Level 1</a></li>
-                     <li><a href="javascript:;">Level 1</a></li>
-                  </ul>
-               </li>
-               <li>
-                  <a href="sitemap.html" class="dropdown-toggle no-arrow">
-                     <span class="micon dw dw-diagram"></span><span class="mtext">Sitemap</span>
-                  </a>
-               </li>
-               <li>
-                  <a href="chat.html" class="dropdown-toggle no-arrow">
-                     <span class="micon dw dw-chat3"></span><span class="mtext">Chat</span>
-                  </a>
-               </li>
-               <li>
-                  <a href="invoice.html" class="dropdown-toggle no-arrow">
-                     <span class="micon dw dw-invoice"></span><span class="mtext">Invoice</span>
-                  </a>
-               </li>
+               
                <li>
                   <div class="dropdown-divider"></div>
                </li>
