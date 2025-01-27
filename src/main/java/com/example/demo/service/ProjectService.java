@@ -26,6 +26,7 @@ import com.example.demo.dto.QcDetailVO;
 import com.example.demo.dto.QcVO;
 import com.example.demo.dto.QuotationDetailVO;
 import com.example.demo.dto.QuotationVO;
+import com.example.demo.dto.RecentSalesVO;
 import com.example.demo.dto.RecipeDetailVO;
 import com.example.demo.dto.RecipeVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,7 +62,7 @@ public class ProjectService {
     	}
     	 
     	session.setAttribute("user", member); 
-        mv.setViewName("index");
+    	mv.setViewName("redirect:/index");
     	
     	return mv;
     }
@@ -538,8 +539,22 @@ public class ProjectService {
 	}
 	
 	
+	// 김윤호 25/01/27 부터 새로 작성	
+	
+	public List<RecentSalesVO> getRecentSalesInformations(int day) {
+		return projectDAO.getRecentSalesInformations(day);
+	}
+	
+	
+	
+	
 	
 // 윤호자리 @@@@@@@@@@@@@@윤호윤호@@@@@@@@@@  @@@@@@@@@@@@@@윤호윤호@@@@@@@@@@
+	
+
+	
+	
+	
 	
 	
 

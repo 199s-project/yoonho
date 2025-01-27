@@ -572,7 +572,14 @@ public class ProjectController {
 	}
 	
 	
+	
+	
+	// 김윤호 25/01/27 부터 새로 작성	
 
+	
+	
+	
+	
 	
 	
 	
@@ -1298,6 +1305,12 @@ public class ProjectController {
 	public String salesContractList(Model model) {
 
 		List<QuotationVO> list = projectService.quotationList();
+		
+		for (QuotationVO quotation : list) {
+			quotation.setCompany_name1(projectService.getCompanyByCompanynum(quotation.getCompany_num()).getCompany_name());
+			quotation.setCompany_name2(projectService.getCompanyByCompanynum(quotation.getCompany_num2()).getCompany_name());
+		}
+		
 		model.addAttribute("quotationList", list);
 		log.info("list", list);
 		return "salesContract";
