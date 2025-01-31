@@ -5,7 +5,7 @@
 
 <style>
 
-#DataTables_Table_0_wrapper {
+#DataTables_Table_1_wrapper {
 	width: 96% !important;
 	margin-left: 2% !important;
 }
@@ -42,6 +42,54 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 	padding-right: 10px;
 }
 
+
+
+</style>
+
+
+
+<style>
+
+.uiverse-button1 {
+  position: relative;
+  overflow: hidden;
+  height: 2rem;
+  width: 8.5rem;
+  margin-left: 3rem;
+  border-radius: .25rem;
+  background: blue;
+  background-size: 400%;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.uiverse-button1:hover::before {
+  transform: scaleX(1);
+}
+
+.button1-content {
+  position: relative;
+  z-index: 1;
+}
+
+.uiverse-button1::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  width: 100%;
+  height: inherit;
+  border-radius: inherit;
+  background: linear-gradient(
+    82.3deg,
+    rgba(150, 93, 233, 1) 10.8%,
+    rgba(99, 88, 238, 1) 94.3%
+  );
+  transition: all 0.475s;
+}
 
 
 </style>
@@ -120,12 +168,48 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 						<div id="chart5"></div>
 					</div>
 				</div>
+				
+				
+				
 				<div class="col-xl-4 mb-30">
 					<div class="card-box height-100-p pd-20">
-						<h2 class="h4 mb-20">Lead Target</h2>
-						<div id="chart6"></div>
+						<h5 style="display: inline;">Upcoming Sales Contracts</h5>
+						<button class="uiverse-button1" th:onclick="|location.href='@{salesContract}'|"><span class="button1-content">Go To Release</span></button>
+						<table class="data-table table nowrap bestseller-table" style="padding-top: 13px;">
+							<thead>
+								<tr>
+									<th class="table-plus datatable-nosort">마감일</th>
+									<th>계약서 이름</th>
+									<th>비고</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<th:block th:each="quotation,stat: ${quotationList}" th:if="${stat.index<5}">
+									<tr style="text-align: left;">
+										<td class="table-plus"><th:block th:text="${quotation.quot_enddate}"/></td>
+										<td><a th:href="@{getQuotationDetail(quot_num=${quotation.quot_num})}"><th:block th:text="${quotation.quot_name}"/></td>
+										<td>  
+											<th:block th:if="${quotation.diff > 0}">
+												<span style="color: red;"><th:block th:text="${quotation.diff}"/>일 경과!!</span>
+											</th:block>
+											<th:block th:if="${quotation.diff == 0}">
+												<span style="color: red;">오늘 마감</span>
+											</th:block>
+											<th:block th:if="${quotation.diff < 0}">
+												<span><th:block th:text="${quotation.diff * (-1)}"/>일 뒤 마감</span>
+											</th:block>
+										</td>
+										<td></td>
+									</tr>
+								</th:block>
+							</tbody>
+						</table>
 					</div>
 				</div>
+				
+				
+				
 			</div>
 			<div class="row">
 				<div class="col-xl-4 mb-30">
@@ -272,7 +356,7 @@ fetch('/getRecentSalesInformations') // 엔드포인트 호출
 			},
 		],
 		chart: {
-			height: 90,
+			height: 100,
 			width: 130,
 			type: 'line',
 			zoom: {

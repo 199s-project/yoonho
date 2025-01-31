@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.example.demo.dto.CompanyVO;
 import com.example.demo.dto.FileVO;
 import com.example.demo.dto.ProductVO;
+import com.example.demo.dto.QuotationVO;
 import com.example.demo.dto.RecentSalesVO;
 import com.example.demo.service.ProjectService;
 
@@ -28,30 +29,29 @@ public class HomeController {
 	@GetMapping("/")
     public String Home(Model model){
 		
-        log.info("Home");
+		// 이번주 인기상품
+        int day = 7;
         
-        List<ProductVO> productList = projectService.getProductListWithSales(7); // 최근 7일의 판매량을 가져옴
+        List<ProductVO> productList = projectService.getProductListWithSales(day); // 최근 며칠동안(day)의 판매량을 가져옴
         
-        
-   	   for (ProductVO product : productList) {
-  		   int product_num = product.getProduct_num();
+        for (ProductVO product : productList) {
+        	int product_num = product.getProduct_num();
   		   
-  		   int amount = projectService.fileAmount(product_num);
+        	int amount = projectService.fileAmount(product_num);
   		   
-  		   if (amount == 0) {
-  			   product.setProduct_img("vendors/images/no-image-alert.jpg");
-  		   } else {
-  			   FileVO file = projectService.findFirstImage(product_num);
-  			   product.setProduct_img(file.getFile_path());
-  		   }
-  		   
-  	   }
-        
-        
-        
+        	if (amount == 0) {
+        		product.setProduct_img("vendors/images/no-image-alert.jpg");
+        	} else {
+        		FileVO file = projectService.findFirstImage(product_num);
+        		product.setProduct_img(file.getFile_path());
+        	}
+        }
         model.addAttribute("productSales",productList);
         
         
+        // 판매계약서
+        List<QuotationVO> quotationList = projectService.getUnreleasedQuotationList();
+        model.addAttribute("quotationList",quotationList);
         
         return "index";
     }
@@ -61,11 +61,14 @@ public class HomeController {
     @GetMapping("/getCompanyListWithSales")
     public Map<String,Object> getCompanyListWithSales() {
     	
-    	List<CompanyVO> companyList = projectService.getCompanyListWithSales(7);
+    	// 데이터 없을 땐 day 의 값을 늘리기
+    	int day = 7;
+    	int pieChartSize = 5;
+    	
+    	List<CompanyVO> companyList = projectService.getCompanyListWithSales(day);
     	
     	Map<String,Object> map = new HashMap<>();
     	
-    	int pieChartSize = 5;
     	if (companyList.size()<pieChartSize) {
     		pieChartSize = companyList.size();
     	}
@@ -126,8 +129,19 @@ public class HomeController {
     		count++;
     	}
     	
-    	map.put("dayname",dayname);
-    	map.put("recentTotalAmount",recentTotalAmount);
+//    	map.put("dayname",dayname);
+//    	map.put("recentTotalAmount",recentTotalAmount);
+    	
+    	
+    	// 판매 데이터 없을 때 연습용, 위에 map.put 2줄 주석처리하고 아래 내용 주석 해제해서 적용하기
+    	
+    	String[] daynameTest = {"월","화","수","목","금","토","일"};
+    	int[] recentTotalAmountTest = {105, 34, 58, 95, 132, 116, 125};
+    	
+    	map.put("dayname",daynameTest);
+    	map.put("recentTotalAmount",recentTotalAmountTest);    	
+    	
+    	
     	
     	return map;
     	

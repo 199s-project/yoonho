@@ -483,6 +483,11 @@
 		group by dayname order by diffdate
 	</select>
 	
+	<select id="getUnreleasedQuotationList" resultType="QuotationVO">
+		select *, datediff(now(),quot_enddate) diff from quotation 
+		where quot_stat = "진행중" order by diff desc
+	</select>
+	
 	
 	
 

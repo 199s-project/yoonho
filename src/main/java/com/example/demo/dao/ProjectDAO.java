@@ -175,6 +175,7 @@ public interface ProjectDAO {
 	
 	List<RecentSalesVO> getRecentSalesInformations(int day);
 	
+	List<QuotationVO> getUnreleasedQuotationList();
 	
 	
 	

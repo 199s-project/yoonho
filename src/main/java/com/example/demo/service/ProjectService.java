@@ -545,7 +545,9 @@ public class ProjectService {
 		return projectDAO.getRecentSalesInformations(day);
 	}
 	
-	
+	public List<QuotationVO> getUnreleasedQuotationList() {
+		return projectDAO.getUnreleasedQuotationList();
+	}
 	
 	
 	
