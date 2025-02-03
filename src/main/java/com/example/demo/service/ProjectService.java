@@ -549,7 +549,13 @@ public class ProjectService {
 		return projectDAO.getUnreleasedQuotationList();
 	}
 	
+	public List<QuotationVO> quotationListFinished() {
+		return projectDAO.quotationListFinished();
+	}
 	
+	public List<QuotationVO> quotationListUnfinished() {
+		return projectDAO.quotationListUnfinished();
+	}
 	
 // 윤호자리 @@@@@@@@@@@@@@윤호윤호@@@@@@@@@@  @@@@@@@@@@@@@@윤호윤호@@@@@@@@@@
 	

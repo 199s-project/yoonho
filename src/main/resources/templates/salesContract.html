@@ -88,6 +88,52 @@ div.btn-group {
 
 
 
+<style>
+
+div.tabcontent {
+	margin-left: 30px;
+}
+
+
+input[type="radio"] {
+	display:none;
+}
+
+input[type="radio"] + label {
+	display:inline-block;
+	width: 90px;
+	padding:10px 20px;
+	background:#fff;
+	color:#9a7dab;
+	border-radius: 10px;
+	border: 1px solid #9a7dab;
+	font-size: 14px; 
+	text-align: center;
+	cursor:pointer;
+	box-shadow: 1px 1px 1px 1px lightgray;
+}
+
+input[type = "radio"]:checked + label {
+	background:#9a7dab;
+	color:#fff;
+	border: 1px solid #9a7dab;
+	font-weight: bold;
+}
+
+#DataTables_Table_0_wrapper {
+	display: none;
+}
+
+#DataTables_Table_1_wrapper {
+	display: none;
+}
+
+#DataTables_Table_2_wrapper {
+}
+
+</style>
+
+
 <script>
 
 
@@ -135,6 +181,55 @@ function quotationProceed(quot_num) {
 
 
 
+<script>
+
+function radio1(element) {
+	if (element.checked) {
+		$('#DataTables_Table_0_wrapper').css({
+			"display" : "none",
+		});
+		$('#DataTables_Table_1_wrapper').css({
+			"display" : "none",
+		});
+		$('#DataTables_Table_2_wrapper').css({
+			"display" : "block",
+		});
+	}
+}
+
+function radio2(element) {
+	if (element.checked) {
+		$('#DataTables_Table_0_wrapper').css({
+			"display" : "block",
+		});
+		$('#DataTables_Table_1_wrapper').css({
+			"display" : "none",
+		});
+		$('#DataTables_Table_2_wrapper').css({
+			"display" : "none",
+		});
+	}
+}
+
+function radio3(element) {
+	if (element.checked) {
+		$('#DataTables_Table_0_wrapper').css({
+			"display" : "none",
+		});
+		$('#DataTables_Table_1_wrapper').css({
+			"display" : "block",
+		});
+		$('#DataTables_Table_2_wrapper').css({
+			"display" : "none",
+		});
+	}
+}
+
+</script>
+
+
+
+
 
 </head>
 <body>
@@ -164,57 +259,154 @@ function quotationProceed(quot_num) {
             </div>
             
             <!-- Export Datatable start -->
-            <div class="card-box mb-30">
+			<div class="card-box mb-30">
             
-               <div class="pd-20">
-                  <h4 class="text-blue h4">Data Table with Export Buttons</h4>
-               </div>
-               
-               <div class="pb-20">
-               
-            
-                  <table class="table hover data-table-export nowrap quotation-list-table">
-							<thead>
-								<tr>
-									<th class="hidden_row"></th>
-									<th class="heading-th" width="4%">번호</th>
-									<th width="13%" class="table-plus datatable-nosort">계약서 번호</th>
-									<th>계약서 이름</th>
-									<th width="11%">주문자 명</th>
-									<th width="11%">계약 대상 명</th>
-									<th width="10%">계약일</th>
-									<th width="10%">마감일</th>
-									<th width="5%">상태</th>
-									<th width="11%"></th>
-								</tr>
-							</thead>
-							<tbody>
-									<th:block th:each="form,stat: ${quotationList}">
-										<tr onclick="toggleDetails(1)" th:style="${form.quot_stat == '완료' ? 'color: #a9a9a9;' : ''}">
-											<td class="hidden_row"></td>
-											<td class="heading-td"><th:block th:text="${stat.size-stat.index}"></th:block></td>  
-											<td><th:block th:text="${form.quot_code}"></th:block></td>
-											<td><a th:href="@{getQuotationDetail(quot_num=${form.quot_num})}" th:style="${form.quot_stat == '완료' ? 'color: #a9a9a9;' : ''}"><th:block th:text="${form.quot_name}"></th:block></td>
-											<td><th:block th:text="${form.company_name1}"></th:block></td>
-											<td><th:block th:text="${form.company_name2}"></th:block></td>
-											<td><th:block th:text="${form.quot_startdate}"></th:block></td>
-											<td><th:block th:text="${form.quot_enddate}"></th:block></td>
-											<td><th:block th:text="${form.quot_stat}"></th:block></td>
-											<td>
-												<th:block th:if="${form.quot_stat == '진행중'}">
-													<span class="badge badge-warning" th:onclick="quotationProceed([[${form.quot_num}]])" style="cursor:pointer;">출고</span>
-													<span class="badge badge-reject" th:onclick="quotationProceed([[${form.quot_num}]])" style="cursor:pointer;">취소</span>
-												</th:block>
-											</td>
-										</tr>
-									</th:block>
-							</tbody>
-						</table>
-					</div>
+				<div class="pd-20">
 				</div>
+               
+				<div class="pb-20">
+               
+					<div class="tabcontent">
+					    <input type="radio" name="tab" checked id="tabmenu01" onclick="radio1(this)">
+					    <label for="tabmenu01">전체</label>
+					    <input type="radio" name="tab" id="tabmenu02" onclick="radio2(this)">
+					    <label for="tabmenu02">진행중</label>
+					    <input type="radio" name="tab" id="tabmenu03" onclick="radio3(this)">
+					    <label for="tabmenu03">완료</label>
+					</div><br>
+						
+						
+						
+					<table class="table hover data-table-export nowrap quotation-list-table">
+						<thead>
+							<tr>
+								<th class="hidden_row"></th>
+								<th class="heading-th" width="4%">번호</th>
+								<th width="13%" class="table-plus datatable-nosort">계약서 번호</th>
+								<th>계약서 이름</th>
+								<th width="11%">주문자 명</th>
+								<th width="11%">계약 대상 명</th>
+								<th width="10%">계약일</th>
+								<th width="10%">마감일</th>
+								<th width="5%">상태</th>
+								<th width="11%"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<th:block th:each="form,stat: ${quotationListUnfinished}">
+								<tr onclick="toggleDetails(1)">
+									<td class="hidden_row"></td>
+									<td class="heading-td"><th:block th:text="${stat.size-stat.index}"></th:block></td>  
+									<td><th:block th:text="${form.quot_code}"></th:block></td>
+									<td><a th:href="@{getQuotationDetail(quot_num=${form.quot_num})}" th:style="${form.quot_stat == '완료' ? 'color: #a9a9a9;' : ''}"><th:block th:text="${form.quot_name}"></th:block></td>
+									<td><th:block th:text="${form.company_name1}"></th:block></td>
+									<td><th:block th:text="${form.company_name2}"></th:block></td>
+									<td><th:block th:text="${form.quot_startdate}"></th:block></td>
+									<td><th:block th:text="${form.quot_enddate}"></th:block></td>
+									<td><th:block th:text="${form.quot_stat}"></th:block></td>
+									<td>
+										<th:block th:if="${form.quot_stat == '진행중'}">
+											<span class="badge badge-warning" th:onclick="quotationProceed([[${form.quot_num}]])" style="cursor:pointer;">출고</span>
+											<span class="badge badge-reject" th:onclick="quotationProceed([[${form.quot_num}]])" style="cursor:pointer;">취소</span>
+										</th:block>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+						
+						
+						
+					<table class="table hover data-table-export nowrap quotation-list-table">
+						<thead>
+							<tr>
+								<th class="hidden_row"></th>
+								<th class="heading-th" width="4%">번호</th>
+								<th width="13%" class="table-plus datatable-nosort">계약서 번호</th>
+								<th>계약서 이름</th>
+								<th width="11%">주문자 명</th>
+								<th width="11%">계약 대상 명</th>
+								<th width="10%">계약일</th>
+								<th width="10%">마감일</th>
+								<th width="5%">상태</th>
+								<th width="11%"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<th:block th:each="form,stat: ${quotationListFinished}">
+								<tr onclick="toggleDetails(1)">
+									<td class="hidden_row"></td>
+									<td class="heading-td"><th:block th:text="${stat.size-stat.index}"></th:block></td>  
+									<td><th:block th:text="${form.quot_code}"></th:block></td>
+									<td><a th:href="@{getQuotationDetail(quot_num=${form.quot_num})}" th:style="${form.quot_stat == '완료' ? 'color: #a9a9a9;' : ''}"><th:block th:text="${form.quot_name}"></th:block></td>
+									<td><th:block th:text="${form.company_name1}"></th:block></td>
+									<td><th:block th:text="${form.company_name2}"></th:block></td>
+									<td><th:block th:text="${form.quot_startdate}"></th:block></td>
+									<td><th:block th:text="${form.quot_enddate}"></th:block></td>
+									<td><th:block th:text="${form.quot_stat}"></th:block></td>
+									<td>
+										<th:block th:if="${form.quot_stat == '진행중'}">
+											<span class="badge badge-warning" th:onclick="quotationProceed([[${form.quot_num}]])" style="cursor:pointer;">출고</span>
+											<span class="badge badge-reject" th:onclick="quotationProceed([[${form.quot_num}]])" style="cursor:pointer;">취소</span>
+										</th:block>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+						
+						
+						
+						
+						
+						
+					<table class="table hover data-table-export nowrap quotation-list-table">
+						<thead>
+							<tr>
+								<th class="hidden_row"></th>
+								<th class="heading-th" width="4%">번호</th>
+								<th width="13%" class="table-plus datatable-nosort">계약서 번호</th>
+								<th>계약서 이름</th>
+								<th width="11%">주문자 명</th>
+								<th width="11%">계약 대상 명</th>
+								<th width="10%">계약일</th>
+								<th width="10%">마감일</th>
+								<th width="5%">상태</th>
+								<th width="11%"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<th:block th:each="form,stat: ${quotationList}">
+								<tr onclick="toggleDetails(1)">
+									<td class="hidden_row"></td>
+									<td class="heading-td"><th:block th:text="${stat.size-stat.index}"></th:block></td>  
+									<td><th:block th:text="${form.quot_code}"></th:block></td>
+									<td><a th:href="@{getQuotationDetail(quot_num=${form.quot_num})}" th:style="${form.quot_stat == '완료' ? 'color: #a9a9a9;' : ''}"><th:block th:text="${form.quot_name}"></th:block></td>
+									<td><th:block th:text="${form.company_name1}"></th:block></td>
+									<td><th:block th:text="${form.company_name2}"></th:block></td>
+									<td><th:block th:text="${form.quot_startdate}"></th:block></td>
+									<td><th:block th:text="${form.quot_enddate}"></th:block></td>
+									<td><th:block th:text="${form.quot_stat}"></th:block></td>
+									<td>
+										<th:block th:if="${form.quot_stat == '진행중'}">
+											<span class="badge badge-warning" th:onclick="quotationProceed([[${form.quot_num}]])" style="cursor:pointer;">출고</span>
+											<span class="badge badge-reject" th:onclick="quotationProceed([[${form.quot_num}]])" style="cursor:pointer;">취소</span>
+										</th:block>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+					
+					
+					
+					
+					
+				</div>
+			</div>
             
             <!-- Export Datatable End -->
-         </div>
+		</div>
          
          
          

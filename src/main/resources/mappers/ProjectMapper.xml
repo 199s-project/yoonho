@@ -488,9 +488,37 @@
 		where quot_stat = "진행중" order by diff desc
 	</select>
 	
+	<select id="quotationListFinished" resultType="QuotationVO">
+	   SELECT 
+	        quotation.*,
+	        SUM(quotationdetail.quotdetail_price) AS total_price
+	    FROM 
+	        quotation
+	    JOIN 
+	        quotationdetail
+	    ON 
+	        quotation.quot_num = quotationdetail.quot_num
+	    where quot_stat = "완료"
+	    GROUP BY 
+	        quotation.quot_num
+	    order by quotation.quot_regdate desc;
+	</select>
 	
-	
-
+	<select id="quotationListUnfinished" resultType="QuotationVO">
+	   SELECT 
+	        quotation.*,
+	        SUM(quotationdetail.quotdetail_price) AS total_price
+	    FROM 
+	        quotation
+	    JOIN 
+	        quotationdetail
+	    ON 
+	        quotation.quot_num = quotationdetail.quot_num
+	    where quot_stat = "진행중"
+	    GROUP BY 
+	        quotation.quot_num
+	    order by quotation.quot_regdate desc;
+	</select>
 	
 <!-- 김민성 ========================================================================================= -->
 	

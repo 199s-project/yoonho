@@ -177,7 +177,9 @@ public interface ProjectDAO {
 	
 	List<QuotationVO> getUnreleasedQuotationList();
 	
+	List<QuotationVO> quotationListFinished();
 	
+	List<QuotationVO> quotationListUnfinished();
 	
 	
  

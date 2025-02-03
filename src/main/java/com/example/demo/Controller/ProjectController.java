@@ -1311,8 +1311,24 @@ public class ProjectController {
 			quotation.setCompany_name2(projectService.getCompanyByCompanynum(quotation.getCompany_num2()).getCompany_name());
 		}
 		
+		List<QuotationVO> list2 = projectService.quotationListFinished();
+		
+		for (QuotationVO quotation : list2) {
+			quotation.setCompany_name1(projectService.getCompanyByCompanynum(quotation.getCompany_num()).getCompany_name());
+			quotation.setCompany_name2(projectService.getCompanyByCompanynum(quotation.getCompany_num2()).getCompany_name());
+		}
+		
+		List<QuotationVO> list3 = projectService.quotationListUnfinished();
+		
+		for (QuotationVO quotation : list3) {
+			quotation.setCompany_name1(projectService.getCompanyByCompanynum(quotation.getCompany_num()).getCompany_name());
+			quotation.setCompany_name2(projectService.getCompanyByCompanynum(quotation.getCompany_num2()).getCompany_name());
+		}
+		
 		model.addAttribute("quotationList", list);
-		log.info("list", list);
+		model.addAttribute("quotationListFinished", list2);
+		model.addAttribute("quotationListUnfinished", list3);
+		
 		return "salesContract";
 	}
 

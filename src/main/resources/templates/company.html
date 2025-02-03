@@ -21,6 +21,7 @@ table.company-list-table {
 	    background-color: #f4f4f4; /* 헤더 배경색 */
 	    font-weight: bold; /* 헤더 강조 */
 	    height: 30px;
+	    vertical-align: middle !important;
 	}
 	
 	tr:hover {
@@ -148,7 +149,10 @@ table.company-list-table {
 }
 
 
-
+span.badge {
+	text-align: center !important;
+	padding: 12px 13px 10px 12px;
+}
 
 </style>
 
@@ -831,9 +835,9 @@ function company_register_codeValidation() {
 											<td><th:block th:text="${form.company_email}"></th:block></td>
 											<td><span th:text="${form.company_address}" th:onclick="openKakaomap([[${form.company_address}]],[[${form.company_name}]])"
 												style="cursor:pointer;" data-toggle="tooltip" data-placement="bottom" title th:data-original-title="${form.company_address}"></span></td>
-											<td><span th:text="수정" th:onclick="updateCompany([[${form.company_name}]],[[${form.company_address}]])"
+											<td style="text-align: center;"><span th:text="수정" class="badge badge-warning" th:onclick="updateCompany([[${form.company_name}]],[[${form.company_address}]])"
 												style="cursor:pointer;"></td>
-											<td>삭제</td>
+											<td style="text-align: center;">삭제</td>
 										</tr>
 									</th:block>
 							</tbody>
