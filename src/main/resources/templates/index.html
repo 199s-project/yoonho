@@ -37,7 +37,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 }
 
 
-#chart1 {
+#dashboard-chart1, #dashboard-chart2, #dashboard-chart3 {
 	float: right;
 	padding-right: 10px;
 }
@@ -116,7 +116,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 								</div>
 							</div>
 							<div class="progress-data">
-								<span id="chart1"></span>
+								<span id="dashboard-chart1"></span>
 							</div>
 						</div>
 					</div>
@@ -124,12 +124,16 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 				<div class="col-xl-3 mb-30">
 					<div class="card-box height-100-p widget-style1">
 						<div class="d-flex flex-wrap align-items-center">
-							<div class="progress-data">
-								<div id="chart2"></div>
-							</div>
 							<div class="widget-data">
-								<div class="h4 mb-0">400</div>
-								<div class="weight-600 font-14">Deals</div>
+								<div class="weight-600 font-14" style="font-size: 16px;">Today Sales</div>
+								<div class="h2 mb-0" id="today-salesAmount" style="padding: 4px 0 2px 0;"></div>
+								<div class="weight-600 font-14">
+									<span id="today-salesAmount-changeRate" style="font-size: 18px;">↑4.63%</span>
+									<span id="additional-text-2" style="font-size: 13px;">전일 대비</span>
+								</div>
+							</div>
+							<div class="progress-data">
+								<span id="dashboard-chart2"></span>
 							</div>
 						</div>
 					</div>
@@ -406,7 +410,7 @@ fetch('/getRecentSalesInformations') // 엔드포인트 호출
         },
 	};
 
-	var chart = new ApexCharts(document.querySelector("#chart1"), options);
+	var chart = new ApexCharts(document.querySelector("#dashboard-chart1"), options);
 	chart.render();
 	
 	document.getElementById("today-orderAmount").textContent = map.recentTotalAmount[map.recentTotalAmount.length-1];
@@ -435,7 +439,95 @@ fetch('/getRecentSalesInformations') // 엔드포인트 호출
 			element.style.color = "red";
 		}
 	}
-		
+	
+	var options2 = {
+			series: [
+				{
+					name: "Desktops",
+					data: map.recentTotalSales
+				},
+			],
+			chart: {
+				height: 100,
+				width: 130,
+				type: 'line',
+				zoom: {
+					enabled: false
+				},
+				toolbar: {
+					show: false
+				},
+			},
+			dataLabels: {
+				enabled: false
+			},
+			stroke: {
+				curve: 'smooth',
+				width: 3
+			},
+			grid: {
+				show: false,
+			},
+			xaxis: {  
+				axisBorder: { show: false },
+				axisTicks: { show: false },
+				labels: { show: false },
+		        tooltip: {
+		            enabled: false,
+		        }
+			},
+			yaxis: {
+				show: false,
+			},
+			fill: {
+				  type: 'gradient',
+				  gradient: { gradientToColors: ['#0be881'], stops: [0, 100] },
+			},
+	        tooltip: {
+	            custom: function({ series, seriesIndex, dataPointIndex }) {
+					const value = series[seriesIndex][dataPointIndex];
+					const month = label[dataPointIndex];
+					return `<div style="padding: 5px; font-size: 10px; background: #f4f4f4; border-radius: 5px;">
+	                            <strong>${month} : ￦${value.toLocaleString()}</strong>
+	                        </div>`;
+	            },
+	            style: {
+	                fontSize: '10px',
+	                fontFamily: 'Arial, sans-serif'
+	            }
+	        },
+		};
+	
+	var chart2 = new ApexCharts(document.querySelector("#dashboard-chart2"), options2);
+	chart2.render();
+
+	document.getElementById("today-salesAmount").textContent = '￦'+map.recentTotalSales[map.recentTotalSales.length-1].toLocaleString();
+	const chart2_element = document.getElementById("today-salesAmount-changeRate");
+	const chart2_element2 = document.getElementById("additional-text-2");
+	const chart2_today = map.recentTotalSales[map.recentTotalSales.length-1];
+	const chart2_yesterday = map.recentTotalSales[map.recentTotalSales.length-2];
+	
+	if (chart2_yesterday == 0) {
+		if (chart2_today == 0) {
+			chart2_element.textContent = "";
+			chart2_element2.textContent = "어제~금일 판매기록 없음";
+		} else {
+			chart2_element.textContent = "▲ 100%  ";
+			chart2_element.style.color = "red";
+		}
+	} else if (chart2_today/chart2_yesterday) {
+		if (chart2_today == 0) {
+			chart2_element.textContent = "";
+			chart2_element2.textContent = "금일 판매기록 없음";
+		} else if (chart2_today/chart2_yesterday<1) {
+			chart2_element.textContent = "▼ "+(100*(1-chart2_today/chart2_yesterday)).toFixed(2)+"%";
+			chart2_element.style.color = "blue";
+		} else {
+			chart2_element.textContent = "▲ "+(100*(chart2_today/chart2_yesterday-1)).toFixed(2)+"%";
+			chart2_element.style.color = "red";
+		}
+	}
+	
 })
 .catch(error => {
 	    console.error('Error fetching company names:', error);

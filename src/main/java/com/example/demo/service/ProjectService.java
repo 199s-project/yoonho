@@ -557,6 +557,15 @@ public class ProjectService {
 		return projectDAO.quotationListUnfinished();
 	}
 	
+	public int product_totalRecord() {
+		return projectDAO.product_totalRecord();
+	}
+	
+	public List<ProductVO> productListForPaging(int start, int productPageSIZE) {
+		return projectDAO.productListForPaging(start, productPageSIZE);
+	}
+	
+	
 // 윤호자리 @@@@@@@@@@@@@@윤호윤호@@@@@@@@@@  @@@@@@@@@@@@@@윤호윤호@@@@@@@@@@
 	
 

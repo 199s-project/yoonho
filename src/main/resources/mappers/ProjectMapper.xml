@@ -474,7 +474,8 @@
 		end as dayname from (
 			select quotationdetail.*, B.diff, B.dayname, B.quot_regdate regdate from quotationdetail, (
 				select * from (
-					select *, datediff(now(),quot_regdate) diff, dayofweek(quot_regdate) dayname from quotation
+					select q.*, datediff(now(),r.release_date) diff, dayofweek(r.release_date) dayname from quotation q, quotationrelease r
+					where r.quot_num = q.quot_num
 				) A 
 				where A.diff &lt; #{day}
 			) B
@@ -519,6 +520,20 @@
 	        quotation.quot_num
 	    order by quotation.quot_regdate desc;
 	</select>
+	
+	<select id="product_totalRecord" resultType="int">
+		select count(*) from product
+	</select>
+	
+	<select id="productListForPaging" parameterType="java.util.Map" resultType="ProductVO">
+		select *, 0 as file_amount, 'file_name' as file_name, 'file_path' as file_path from product
+		order by product_num desc
+		LIMIT #{start}, #{productPageSIZE}
+	</select>
+	
+	
+	
+	
 	
 <!-- 김민성 ========================================================================================= -->
 	

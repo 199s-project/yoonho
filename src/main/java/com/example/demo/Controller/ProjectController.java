@@ -390,35 +390,76 @@ public class ProjectController {
 	    return cnt;
 	}
     
+    
+    
+	public static int productPageSIZE = 9; // 한 페이지에 담을 게시글의 개수
+	public static int productTotalRecord = 0;
+	public static int productTotalPage = 1;
+
+	public static int productStartPage = 1;
+	public static int productEndPage = 10;
+	public static int productPageListSIZE = 10;
+    
     // 제품 리스트 화면 이동
     @GetMapping("product")
-    public String product(Model model) {
-  	   log.info("product");
+    public ModelAndView product(@RequestParam(value = "pageNUM", defaultValue = "1") int pageNUM,
+			@RequestParam(value = "pageListNUM", defaultValue = "1") int pageListNUM) {
   	   
-  	   List<ProductVO> productList = projectService.productList();
+    	log.info(pageNUM+"");
+    	
+		productTotalRecord = projectService.product_totalRecord(); // del=0인 게시글의 총 개수
+		productTotalPage = productTotalRecord / productPageSIZE;
+		if (productTotalRecord % productPageSIZE != 0) {
+			productTotalPage++;
+		}
+
+		int start = (pageNUM - 1) * productPageSIZE;
+
+		productStartPage = (pageListNUM - 1) * productPageListSIZE + 1;
+		productEndPage = productStartPage + productPageListSIZE - 1;
+		if (productEndPage > productTotalPage) {
+			productEndPage = productTotalPage;
+		}
+    	
+		ModelAndView mav = new ModelAndView();
+		
+    	
+		List<ProductVO> productList = projectService.productListForPaging(start, productPageSIZE);
   	   
-  	   for (ProductVO product : productList) {
-  		   int product_num = product.getProduct_num();
+		for (ProductVO product : productList) {
+			int product_num = product.getProduct_num();
   		   
-  		   int amount = projectService.fileAmount(product_num);
+			int amount = projectService.fileAmount(product_num);
   		   
-  		   if (amount == 0) {
-  			   product.setFile_name("No Image");
-  			   product.setFile_path("vendors/images/no-image-alert.jpg");
-  		   } else {
-  			   FileVO file = projectService.findFirstImage(product_num);
-  			   product.setFile_amount(amount);
-  			   product.setFile_name(file.getFile_name());
-  			   product.setFile_path(file.getFile_path());
-  		   }
-  		   
-  	   }
+			if (amount == 0) {
+				product.setFile_name("No Image");
+				product.setFile_path("vendors/images/no-image-alert.jpg");
+			} else {
+				FileVO file = projectService.findFirstImage(product_num);
+				product.setFile_amount(amount);
+				product.setFile_name(file.getFile_name());
+				product.setFile_path(file.getFile_path());
+			}
+		}
   	   
+		mav.addObject("list", productList);
+		
+		mav.addObject("totalPage", productTotalPage);
+		mav.addObject("startPage", productStartPage);
+		mav.addObject("pageListNUM", pageListNUM);
+		mav.addObject("endPage", productEndPage);
+		
+		mav.addObject("pageNUM", pageNUM);
+		
+		mav.setViewName("product");
   	   
-  	   model.addAttribute("productList",productList);
-  	   
-  	   return "product";
+		return mav;
 	}
+    
+    
+    
+    
+    
     
     @GetMapping("/getProductDetail")
     public ResponseEntity<?> getProductDetail(@RequestParam("product_num") int product_num, Model model) {

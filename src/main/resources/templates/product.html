@@ -457,7 +457,7 @@ function product_companyNameCheck() {
 					<div class="product-list">
 						<ul class="row">
 						
-							<th:block th:each="product,stat: ${productList}">
+							<th:block th:each="product,stat: ${list}">
 								<li class="col-lg-4 col-md-6 col-sm-12">
 									<div class="product-box">
 										<div class="producct-img product-thumbnail">
@@ -478,19 +478,64 @@ function product_companyNameCheck() {
 						
 						</ul>
 					</div>
+					
+
+					
+					
+					
 					<div class="blog-pagination mb-30">
 						<div class="btn-toolbar justify-content-center mb-15">
 							<div class="btn-group">
-								<a href="#" class="btn btn-outline-primary prev"><i class="fa fa-angle-double-left"></i></a>
-								<a href="#" class="btn btn-outline-primary">1</a>
-								<a href="#" class="btn btn-outline-primary">2</a>
-								<span class="btn btn-primary current">3</span>
-								<a href="#" class="btn btn-outline-primary">4</a>
-								<a href="#" class="btn btn-outline-primary">5</a>
-								<a href="#" class="btn btn-outline-primary next"><i class="fa fa-angle-double-right"></i></a>
+							
+								<th:block th:if="${pageListNUM>1}">
+									<a href="product?pageListNUM=${pageListNUM-1}&pageNUM=${pageListNUM*10-10}" class="btn btn-outline-primary prev">&lt;</a>
+								</th:block>
+								<th:block th:if="${pageListNUM<=1}">
+									<a class="btn btn-outline-primary prev" style="color:lightgray; pointer-events: none">&lt;</a>
+								</th:block>
+								
+								<th:block th:each="i : ${#numbers.sequence(startPage, endPage)}">
+								
+								    <th:block th:if="${pageNUM == null}">
+								    	<th:block th:if="${i == 1}">
+								    		<a href="@{/product(pageListNUM=${pageListNUM}, pageNUM=${i})}" style="color: #ca1515;" class="btn btn-outline-primary">[[${i}]]</a>
+								    	</th:block>
+								    	<th:block th:if="${i != 1}">
+								    		<a th:href="@{/product(pageListNUM=${pageListNUM}, pageNUM=${i})}" class="btn btn-outline-primary">[[${i}]]</a>
+								    	</th:block>
+								    </th:block>
+								    <th:block th:if="${pageNUM != null}">
+								    	<th:block th:if="${i == pageNUM}">
+								    		<a th:href="@{/product(pageListNUM=${pageListNUM}, pageNUM=${i})}" style="color: #ca1515;" class="btn btn-outline-primary">[[${i}]]</a>
+								    	</th:block>
+								    	<th:block th:if="${i != pageNUM}">
+								    		<a th:href="@{/product(pageListNUM=${pageListNUM}, pageNUM=${i})}" class="btn btn-outline-primary">[[${i}]]</a>
+								    	</th:block>
+								    </th:block>
+								</th:block>
+								
+								<th:block th:if="${pageListNUM<(totalPage/10)}">
+									<a href="product?pageListNUM=${pageListNUM-1}&pageNUM=${pageListNUM*10-10}" class="btn btn-outline-primary prev">&gt;</a>
+								</th:block>
+								<th:block th:if="${pageListNUM>=(totalPage/10)}">
+									<a class="btn btn-outline-primary prev" style="color:lightgray; pointer-events: none">&gt;</a>
+								</th:block>
+								
+								
+								
 							</div>
 						</div>
 					</div>
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
 				</div>
 
 

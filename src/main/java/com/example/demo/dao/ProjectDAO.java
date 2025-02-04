@@ -181,6 +181,10 @@ public interface ProjectDAO {
 	
 	List<QuotationVO> quotationListUnfinished();
 	
+	int product_totalRecord();
+	
+	List<ProductVO> productListForPaging(@Param("start")int start, @Param("productPageSIZE")int productPageSIZE);
+	
 	
  
 	// new 작업공간 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@윤호윤호윤호@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  끝
