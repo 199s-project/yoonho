@@ -820,7 +820,6 @@ function company_register_codeValidation() {
 									<th class="th-email">이메일</th>
 									<th>주소</th>
 									<th style="width: 4%;">수정</th>
-									<th style="width: 4%;">삭제</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -837,7 +836,6 @@ function company_register_codeValidation() {
 												style="cursor:pointer;" data-toggle="tooltip" data-placement="bottom" title th:data-original-title="${form.company_address}"></span></td>
 											<td style="text-align: center;"><span th:text="수정" class="badge badge-warning" th:onclick="updateCompany([[${form.company_name}]],[[${form.company_address}]])"
 												style="cursor:pointer;"></td>
-											<td style="text-align: center;">삭제</td>
 										</tr>
 									</th:block>
 							</tbody>

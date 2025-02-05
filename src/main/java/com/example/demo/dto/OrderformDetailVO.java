@@ -14,4 +14,7 @@ public class OrderformDetailVO {
 	private int product_num;
 	private int orderdetail_amount;
 	private int orderdetail_price;
+	
+	private String product_name;
+	private String material_name;
 }

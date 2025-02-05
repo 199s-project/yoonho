@@ -18,7 +18,8 @@ public class OrderformVO {
 	private String orderform_regdate;
 	private String orderform_startDate;
 	private String orderform_endDate;
-	
+	private String orderform_code;
+	private String orderform_writer;
 	
 	//orderformDetailVO
 	private int orderdetail_num;
@@ -27,5 +28,6 @@ public class OrderformVO {
 	private int orderdetail_price;
 	private int total_price;
 	
-	
+	private String company_name1;
+	private String company_name2;
 }

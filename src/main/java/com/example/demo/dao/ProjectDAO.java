@@ -6,8 +6,11 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.example.demo.dto.AvgMaterialpriceVO;
 import com.example.demo.dto.CompanyVO;
 import com.example.demo.dto.FileVO;
+import com.example.demo.dto.InventoryAppropriateAmountVO;
+import com.example.demo.dto.InventoryProductAppropriateAmountVO;
 import com.example.demo.dto.InventoryVO;
 import com.example.demo.dto.MaterialVO;
 import com.example.demo.dto.MemberVO;
@@ -16,6 +19,7 @@ import com.example.demo.dto.OrderformVO;
 import com.example.demo.dto.ProductVO;
 import com.example.demo.dto.ProductionDetailVO;
 import com.example.demo.dto.ProductionVO;
+import com.example.demo.dto.QcDashVO;
 import com.example.demo.dto.QcDetailVO;
 import com.example.demo.dto.QcVO;
 import com.example.demo.dto.QuotationDetailVO;
@@ -74,6 +78,11 @@ public interface ProjectDAO {
 
 	int insertQuotationDetail(QuotationDetailVO quotationDetailVO);
    
+	
+	
+	
+	
+	
 	// 나현. 시작.
 	// QC
 	
@@ -141,6 +150,12 @@ public interface ProjectDAO {
 	
 	// 박나현이 김민성 부분 합치다가 추가한 것. 끝 -----------------------------------------------
 	
+	// 25.01.31 대시보드
+	
+	List<QcDashVO> QcMDashTop5();
+	
+	List<QcDashVO> QcPDashTop5();
+	
 	// 나현. 끝.
 
 
@@ -184,6 +199,8 @@ public interface ProjectDAO {
 	int product_totalRecord();
 	
 	List<ProductVO> productListForPaging(@Param("start")int start, @Param("productPageSIZE")int productPageSIZE);
+	
+	List<RecentSalesVO> getRecentProduceInformations(int day);
 	
 	
  
@@ -236,7 +253,17 @@ public interface ProjectDAO {
 
 	int getFindRecipeNum(String product_name);
 
-	List<InventoryVO> getFindInvenList(String product_name);
+	List<InventoryVO> getFindInvenList();
+	
+	//0203
+	
+	Map<String,Object> getPdCheckCounts();
+	
+	int getPdCheckCount1();
+
+	int getPdCheckCount2();
+
+	List<ProductionVO> getLastProduction();
 	
 	// ---------------------김민성---------------------------------	
 	
@@ -327,6 +354,30 @@ public interface ProjectDAO {
    
    int updateOrderformFinish (int orderform_num);
    
+   int insertOrderformCode(@Param("orderform_num")int orderform_num, @Param("code")String code);
+   
+   int updateInventoryAppropriateAmount(InventoryVO inventoryVO);
+   
+   int materialNameCheck(String material_name);
+   
+   List<InventoryAppropriateAmountVO> getInventoryAppropriateAmount();
+   
+   int addAppropriateAmount(Map<String,Object> map);
+   
+   List<AvgMaterialpriceVO> getAllAvgMaterialprice();
+   
+   AvgMaterialpriceVO getOneAvgMaterialprice(int product_num);
+   
+   String getOrderformWriter(int orderform_num);
+   
+   int updateMaterialInvenPrice(AvgMaterialpriceVO avgMaterialpriceVO);
+   
 // new 작업공간 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 이의재 끝   
+   
+   int deleteOrderform(int orderform_num);
+   
+   int deleteOrderformDetail(int orderform_num);
+   
+   List<InventoryProductAppropriateAmountVO> getInventoryProductAppropriateAmount();
    
 }

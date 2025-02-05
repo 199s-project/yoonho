@@ -76,7 +76,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
                      <nav aria-label="breadcrumb" role="navigation">
                         <ol class="breadcrumb">
                            <li class="breadcrumb-item"><a href="index">Home</a></li>
-                           <li class="breadcrumb-item active" aria-current="page">생산 계획서</li>
+                           <li class="breadcrumb-item active" aria-current="page">공장 작업List</li>
                         </ol>
                      </nav>
                   </div>
@@ -90,7 +90,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
             <div class="card-box mb-30">
             
                <div class="pd-20 d-flex align-items-center justify-content-between">
-   					<h4 class="text-blue h4">Data Table with Export Buttons</h4>
+   					<h4 class="text-blue h4">공장 작업List</h4>
     				<button th:onclick="|location.href='@{productionForm}'|" value="생산 계획서 작성" class="btn btn-primary m-2 rowbtn">생산 계획서 작성</button>
 			   </div>
                
@@ -109,14 +109,14 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
                         </tr>
                      </thead>
                      <tbody>
-                        <th:block th:each="form,stat: ${getProductionPlanList}">
+                        <th:block th:each="form,stat: ${getFatoryWorkList}">
                            <tr>
                            	  <td class="hidden_row"></td>
                               <td><th:block th:text="${stat.size-stat.index}"></th:block></td> 
                               <td><th:block th:text="${form.pd_writer}"></th:block></td>
                               <td><a th:href="@{getFactoryDetail(pd_num=${form.pd_num})}"><th:block th:text="${form.pd_name}"></th:block></a></td>
                               <td><th:block th:text="${form.pd_writedate}"></th:block></td>
-                              <td><th:block th:if="${form.pd_check == 0}" th:text="'추가된 업무'"></th:block></td>
+                              <td><th:block th:if="${form.pd_check == 0}"><span class="badge badge-success" th:text="'추가된 업무'"></span></th:block></td>
                            </tr>
                         </th:block>
                      </tbody>
@@ -126,12 +126,6 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
             
             <!-- Export Datatable End -->
          </div>
-         
-         
-         
-         
-         
-         
          <div class="footer-wrap pd-20 mb-20 card-box">
            we are all 1995's  <a href="" target="_blank">Suit</a>
          </div>

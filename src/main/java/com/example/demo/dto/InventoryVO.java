@@ -15,5 +15,5 @@ public class InventoryVO {
 	private int inven_type;
 	private int inven_price;
 	private int inven_amount;
-	
+	private int inven_appropriate_amount;
 }

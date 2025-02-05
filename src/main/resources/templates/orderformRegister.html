@@ -229,26 +229,16 @@ function rowproductChange(event) {
 					<div class="row">
 						<div class="col-md-6 col-sm-12">
 							<div class="title">
-								<h4>DataTable</h4>
+								<h4>서류 작성</h4>
 							</div>
 							<nav aria-label="breadcrumb" role="navigation">
 								<ol class="breadcrumb">
 									<li class="breadcrumb-item"><a href="index.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">DataTable</li>
+									<li class="breadcrumb-item active" aria-current="page">구매 계약서 작성</li>
 								</ol>
 							</nav>
 						</div>
 						<div class="col-md-6 col-sm-12 text-right">
-							<div class="dropdown">
-								<a class="btn btn-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-									January 2018
-								</a>
-								<div class="dropdown-menu dropdown-menu-right">
-									<a class="dropdown-item" href="#">Export List</a>
-									<a class="dropdown-item" href="#">Policies</a>
-									<a class="dropdown-item" href="#">View Assets</a>
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -262,6 +252,7 @@ function rowproductChange(event) {
 				<form action="postOrderformRegister" method="post">
 					<input type="hidden" name="orderform_stat" value="진행중" />
 					<input type="hidden" name="orderform_num" value="0" />
+					<!-- <input type="hidden" id="orderform_writer" name="orderform_writer" th:value="${user.member_name}"> -->
 					<table class="input-auto-size">
 						<tr>
 				            <td class="heading-section" width="15%" >계약서 이름</td>

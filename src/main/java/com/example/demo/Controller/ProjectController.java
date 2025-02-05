@@ -24,8 +24,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.dto.AvgMaterialpriceVO;
 import com.example.demo.dto.CompanyVO;
 import com.example.demo.dto.FileVO;
+import com.example.demo.dto.InventoryAppropriateAmountVO;
+import com.example.demo.dto.InventoryProductAppropriateAmountVO;
 import com.example.demo.dto.InventoryVO;
 import com.example.demo.dto.MaterialVO;
 import com.example.demo.dto.MemberVO;
@@ -955,322 +958,387 @@ public class ProjectController {
     
 	@ResponseBody
 	@PostMapping("/orderformProceed")
-	public int orderformProceed(@RequestParam("orderform_num") int orderform_num){
+	public int orderformProceed(@RequestParam("orderform_num") int orderform_num) throws Exception{
 	    List<OrderformDetailVO> orderformDetailList = projectService.getOrderformDetailListByOrderformnum(orderform_num);
-	    
-	    
+	    List<AvgMaterialpriceVO> AvgMaterialpriceList = projectService.getAllAvgMaterialprice();
 	    
 	    for (OrderformDetailVO orderformDetail : orderformDetailList) {
-	    	
 		
 			QcVO qcVO = new QcVO();
 			
 	    	qcVO.setQc_type("order");
 	    	qcVO.setPaper_num(orderform_num);
-	    	qcVO.setQc_writer("test");
 	    	qcVO.setQc_item_num(orderformDetail.getProduct_num());
 	    	qcVO.setQc_quan(orderformDetail.getOrderdetail_amount());
 	    	
-	    	
-	    	
 	    	int result = projectService.insertqc(qcVO);
+	    }
+	    
+	    for (AvgMaterialpriceVO avgMaterialprice : AvgMaterialpriceList) {
+	    	int r = projectService.updateMaterialInvenPrice(avgMaterialprice);
 	    }
 	    
 	    int result2 = projectService.updateOrderformFinish(orderform_num);
 	    
 		return result2;
 	}
+	
+	@GetMapping("getInventoryAppropriateAmountRegister")
+	public String getInventoryAppropriateAmountRegister() {
+		mv = new ModelAndView();
+		
+		return "getInventoryAppropriateAmountRegister";
+	}
+	
+    @ResponseBody
+    @PostMapping("/getInventoryAppropriateAmount")
+    public ResponseEntity<List<InventoryAppropriateAmountVO>> getInventoryAppropriateAmount() throws Exception {
+    	List<InventoryAppropriateAmountVO> inventoryAppropriateAmountListVO = projectService.getInventoryAppropriateAmount();
+    	return ResponseEntity.ok(inventoryAppropriateAmountListVO);
+    }
+    
+    @ResponseBody
+    @PostMapping("/addAppropriateAmount")
+    public ResponseEntity<?> addAppropriateAmount (@RequestBody Map<String,Object> map) throws Exception {
+		System.out.println(map);
+		try {
+			int r = projectService.addAppropriateAmount(map);
+			return ResponseEntity.ok(Map.of("message", "저장 성공"));
+		} catch (Exception e) {
+			return ResponseEntity.ok(Map.of("message", "저장 성공"));
+		}
+	}
+    
+    @ResponseBody
+	@PostMapping("/materialNameCheck")
+	public int materialNameCheck(@RequestParam("material_name") String material_name) {
+	    int cnt = projectService.materialNameCheck(material_name);
+	    return cnt;
+	}
+    
+    
+    @ResponseBody
+    @PostMapping("/getInventoryProductAppropriateAmount")
+    public ResponseEntity<List<InventoryProductAppropriateAmountVO>> getInventoryProductAppropriateAmount() throws Exception {
+    	List<InventoryProductAppropriateAmountVO> inventoryProductAppropriateAmountListVO = projectService.getInventoryProductAppropriateAmount();
+    	return ResponseEntity.ok(inventoryProductAppropriateAmountListVO);
+    }
+    
+    
+    
     
  // -------------------------new 작업공간(이의재) -------------------------    
     
     
- // 박나현 시작. ------------------------------
+    // 박나현 시작. ------------------------------
     
-	// QC 리스트 페이지로 이동
-	@GetMapping("qc")
-	public String qc(Model model) {
-		List<QcVO> QcList = projectService.getQcList();
-		List<QcVO> QcList0 = projectService.getQcList0();
-		List<QcVO> QcList1 = projectService.getQcList1();
-		List<QcVO> QcList2 = projectService.getQcList2();
-		model.addAttribute("QcList", QcList);
-		model.addAttribute("QcList0", QcList0);
-		model.addAttribute("QcList1", QcList1);
-		model.addAttribute("QcList2", QcList2);
-		log.info("qc 이동");
-		return "qc";
-	}
+   	// QC 리스트 페이지로 이동
+   	@GetMapping("qc")
+   	public String qc(Model model) {
+   		List<QcVO> QcList = projectService.getQcList();
+   		List<QcVO> QcList0 = projectService.getQcList0();
+   		List<QcVO> QcList1 = projectService.getQcList1();
+   		List<QcVO> QcList2 = projectService.getQcList2();
+   		model.addAttribute("QcList", QcList);
+   		model.addAttribute("QcList0", QcList0);
+   		model.addAttribute("QcList1", QcList1);
+   		model.addAttribute("QcList2", QcList2);
+   		log.info("qc 이동");
+   		return "qc";
+   	}
 
-	// QC 상세 페이지로 이동
-	@GetMapping("qcDetail")
-	public String qcDetail(@RequestParam("qc_num") int qc_num, Model model) {
+   	// QC 상세 페이지로 이동
+   	@GetMapping("qcDetail")
+   	public String qcDetail(@RequestParam("qc_num") int qc_num, Model model) {
 
-		log.info("qcDetail 이동");
-		log.info("qc_num = " + qc_num);
+   		log.info("qcDetail 이동");
+   		log.info("qc_num = " + qc_num);
 
-		QcVO qc = projectService.getOneQc(qc_num);
+   		QcVO qc = projectService.getOneQc(qc_num);
 
-		// 타입 저장, 이름 담아줄 변수 생성
-		String qctype = qc.getQc_type(); // 타입을 게또
-		String item_name = null; // name은 qc에 들어가지 않고 직접 뿌려줍니다
+   		// 타입 저장, 이름 담아줄 변수 생성
+   		String qctype = qc.getQc_type(); // 타입을 게또
+   		String item_name = null; // name은 qc에 들어가지 않고 직접 뿌려줍니다
 
-		// 원자재 또는 상품 ==> 이름 찾아옴
-		if ("order".equals(qctype)) {
-			item_name = projectService.getQcMName(qc_num);
-			log.info("order로 넘어왔음, item_name == " + item_name);
-		} else if ("plan".equals(qctype)) {
-			item_name = projectService.getQcPName(qc_num);
-			log.info("plan로 넘어왔음, item_name == " + item_name);
-		} else {
-			log.info("통과했슈");
-		}
+   		// 원자재 또는 상품 ==> 이름 찾아옴
+   		if ("order".equals(qctype)) {
+   			item_name = projectService.getQcMName(qc_num);
+   			log.info("order로 넘어왔음, item_name == " + item_name);
+   		} else if ("plan".equals(qctype)) {
+   			item_name = projectService.getQcPName(qc_num);
+   			log.info("plan로 넘어왔음, item_name == " + item_name);
+   		} else {
+   			log.info("통과했슈");
+   		}
 
-		// 상세 내역 불러오기
-		List<QcVO> QcDetailList = projectService.getOneQcDetail(qc_num);
-		int totalQC = qc.getQc_quan();
-		int totalFail = projectService.getTotalFail(qc_num);
-		int totalPass = totalQC - totalFail;
-		double failRate = (double) totalFail / totalQC * 100;
+   		// 상세 내역 불러오기
+   		List<QcVO> QcDetailList = projectService.getOneQcDetail(qc_num);
+   		int totalQC = qc.getQc_quan();
+   		int totalFail = projectService.getTotalFail(qc_num);
+   		int totalPass = totalQC - totalFail;
+   		double failRate = (double) totalFail / totalQC * 100;
 
-		model.addAttribute("qc", qc);
-		model.addAttribute("item_name", item_name);
-		model.addAttribute("qc_num", qc_num);
-		model.addAttribute("QcDetailList", QcDetailList);
-		model.addAttribute("totalQC", totalQC);
-		model.addAttribute("totalFail", totalFail);
-		model.addAttribute("totalPass", totalPass);
-		model.addAttribute("failRate", failRate);
+   		model.addAttribute("qc", qc);
+   		model.addAttribute("item_name", item_name);
+   		model.addAttribute("qc_num", qc_num);
+   		model.addAttribute("QcDetailList", QcDetailList);
+   		model.addAttribute("totalQC", totalQC);
+   		model.addAttribute("totalFail", totalFail);
+   		model.addAttribute("totalPass", totalPass);
+   		model.addAttribute("failRate", failRate);
 
-		return "qcDetail";
-	}
+   		return "qcDetail";
+   	}
 
-	// QC 수정 페이지 이동
-	@GetMapping("qcTest")
-	public String qcTest(@RequestParam("qc_num") int qc_num, Model model, HttpSession session) {
+   	// QC 수정 페이지 이동
+   	@GetMapping("qcTest")
+   	public String qcTest(@RequestParam("qc_num") int qc_num, Model model, HttpSession session) {
 
-		log.info("qcTest 이동");
-		log.info("qc_num = " + qc_num);
+   		log.info("qcTest 이동");
+   		log.info("qc_num = " + qc_num);
 
-		// qc_num으로 qc 기본 정보 불러오기
-		QcVO qc = projectService.getOneQc(qc_num);
+   		// qc_num으로 qc 기본 정보 불러오기
+   		QcVO qc = projectService.getOneQc(qc_num);
 
-		// 타입 저장, 이름 담아줄 변수 생성
-		String qctype = qc.getQc_type();
-		String item_name = null; // name은 qc에 들어가지 않고 직접 출력해줍니다.
+   		// 타입 저장, 이름 담아줄 변수 생성
+   		String qctype = qc.getQc_type();
+   		String item_name = null; // name은 qc에 들어가지 않고 직접 출력해줍니다.
 
-		// 타입 조건문 ==> 이름 찾아옴
-		if ("order".equals(qctype)) {
-			item_name = projectService.getQcMName(qc_num);
-			log.info("order로 넘어왔음, item_name == " + item_name);
-		} else if ("plan".equals(qctype)) {
-			item_name = projectService.getQcPName(qc_num);
-			log.info("plan로 넘어왔음, item_name == " + item_name);
-		} else {
-			log.info("통과했슈");
-		}
+   		// 타입 조건문 ==> 이름 찾아옴
+   		if ("order".equals(qctype)) {
+   			item_name = projectService.getQcMName(qc_num);
+   			log.info("order로 넘어왔음, item_name == " + item_name);
+   		} else if ("plan".equals(qctype)) {
+   			item_name = projectService.getQcPName(qc_num);
+   			log.info("plan로 넘어왔음, item_name == " + item_name);
+   		} else {
+   			log.info("통과했슈");
+   		}
 
-		// qc_num으로 상세 응답 정보 불러오기
-		List<QcVO> QcDetailList = projectService.getOneQcDetail(qc_num);
+   		// qc_num으로 상세 응답 정보 불러오기
+   		List<QcVO> QcDetailList = projectService.getOneQcDetail(qc_num);
 
-		int totalQC = qc.getQc_quan(); // 검사하는 수
-		int totalFail = projectService.getTotalFail(qc_num); // 총 부적격 수
-		int totalPass = totalQC - totalFail; // 총 통과 물품 수
-		double failRate = (double) totalFail / totalQC * 100; // 부적격률 계산
+   		int totalQC = qc.getQc_quan(); // 검사하는 수
+   		int totalFail = projectService.getTotalFail(qc_num); // 총 부적격 수
+   		int totalPass = totalQC - totalFail; // 총 통과 물품 수
+   		double failRate = (double) totalFail / totalQC * 100; // 부적격률 계산
 
-		model.addAttribute("qc", qc);
-		model.addAttribute("item_name", item_name);
-		model.addAttribute("qc_num", qc_num);
-		model.addAttribute("QcDetailList", QcDetailList);
-		model.addAttribute("totalQC", totalQC);
-		model.addAttribute("totalFail", totalFail);
-		model.addAttribute("totalPass", totalPass);
-		model.addAttribute("failRate", failRate);
+   		model.addAttribute("qc", qc);
+   		model.addAttribute("item_name", item_name);
+   		model.addAttribute("qc_num", qc_num);
+   		model.addAttribute("QcDetailList", QcDetailList);
+   		model.addAttribute("totalQC", totalQC);
+   		model.addAttribute("totalFail", totalFail);
+   		model.addAttribute("totalPass", totalPass);
+   		model.addAttribute("failRate", failRate);
 
-		MemberVO user = (MemberVO) session.getAttribute("user");
+   		MemberVO user = (MemberVO) session.getAttribute("user");
 
-		if (user == null) {
-			return "redirect:/login";
-		}
+   		if (user == null) {
+   			return "redirect:/login";
+   		}
 
-		model.addAttribute("member_name", user.getMember_name());
+   		model.addAttribute("member_name", user.getMember_name());
 
-		return "qcTest";
-	}
+   		return "qcTest";
+   	}
 
-	// QC Test 부적격 수량 저장
-	@ResponseBody
-	@PostMapping("updateQcDetail")
-	public ResponseEntity<String> updateQcDetail(@RequestBody List<QcDetailVO> qcDetails) {
+   	// QC Test 부적격 수량 저장
+   	@ResponseBody
+   	@PostMapping("updateQcDetail")
+   	public ResponseEntity<String> updateQcDetail(@RequestBody List<QcDetailVO> qcDetails) {
 
-		try {
-			for (QcDetailVO detail : qcDetails) {
+   		try {
+   			for (QcDetailVO detail : qcDetails) {
 
-				int qc_num = detail.getQc_num();
-				String qc_tester = detail.getQc_tester();
+   				int qc_num = detail.getQc_num();
+   				String qc_tester = detail.getQc_tester();
 
-				log.info("QC 문항 번호: " + detail.getQcq_num());
-				log.info("부적격 수량: " + detail.getQc_fail_quan());
-				log.info("검사자: " + detail.getQc_tester());
+   				log.info("QC 문항 번호: " + detail.getQcq_num());
+   				log.info("부적격 수량: " + detail.getQc_fail_quan());
+   				log.info("검사자: " + detail.getQc_tester());
 
-				QcVO qc = new QcVO();
+   				QcVO qc = new QcVO();
 
-				int isQcDetail = projectService.isQcDetail(detail); // 값 존재하는지 확인
+   				int isQcDetail = projectService.isQcDetail(detail); // 값 존재하는지 확인
 
-				if (isQcDetail == 0) {
-					projectService.insertQcDetail(detail);
-				} else if (isQcDetail == 1) {
-					projectService.updateQcDetail(detail);
-				}
-				projectService.updateQcStat1(detail.getQc_num()); // 상태를 '작성중'으로 변경
+   				if (isQcDetail == 0) {
+   					projectService.insertQcDetail(detail);
+   				} else if (isQcDetail == 1) {
+   					projectService.updateQcDetail(detail);
+   				}
+   				projectService.updateQcStat1(detail.getQc_num()); // 상태를 '작성중'으로 변경
 
-				qc.setQc_num(qc_num);
-				qc.setQc_tester(qc_tester);
+   				qc.setQc_num(qc_num);
+   				qc.setQc_tester(qc_tester);
 
-				projectService.updateQcTester(qc);
-			}
-			return ResponseEntity.ok("Success");
-		} catch (Exception e) {
-			log.error("Error 발생 : ", e); // 에러 로그
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
-		}
-	}
+   				projectService.updateQcTester(qc);
+   			}
+   			return ResponseEntity.ok("Success");
+   		} catch (Exception e) {
+   			log.error("Error 발생 : ", e); // 에러 로그
+   			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
+   		}
+   	}
 
-	// QC Test POST (1. 인벤토리 업데이트 2. qc 상태 업데이트 3. 필요 시 계약서 및 계획서 자동 작성 4. 완료 시 qcList로 이동)
-	@PostMapping("qcTest")
-	public String qcTest(@RequestParam Map<String, String> map, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+   	// QC Test POST (1. 인벤토리 업데이트 2. qc 상태 업데이트 3. 필요 시 계약서 및 계획서 자동 작성 4. 완료 시 qcList로 이동)
+   		@PostMapping("qcTest")
+   		public String qcTest(@RequestParam Map<String, String> map, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
 
-		// 인벤토리 업데이트 & qc 상태 업데이트
-		// 가져온 값 확인
-		System.out.println(map);
-		
-		// 인벤토리에 넣어줄 값 설정
-		String inven_name = map.get("item_name");
-		String qc_type = map.get("qc_type");
-		int inven_item_num = Integer.parseInt(map.get("qc_item_num"));
-		int inven_amount = Integer.parseInt(map.get("totalPass"));
+   			// 인벤토리 업데이트 & qc 상태 업데이트
+   			// 가져온 값 확인
+   			System.out.println(map);
+   			
+   			// 인벤토리에 넣어줄 값 설정
+   			String inven_name = map.get("item_name");
+   			String qc_type = map.get("qc_type");
+   			int inven_item_num = Integer.parseInt(map.get("qc_item_num"));
+   			int inven_amount = Integer.parseInt(map.get("totalPass"));
 
-//		System.out.println("########################## qc_type: " + qc_type);
-//		System.out.println("########################## inven_item_num: " + inven_item_num);
-//		System.out.println("########################## inven_amount: " + inven_amount);
-//		System.out.println("########################## qc_num: " + qc_num);
+//   			System.out.println("########################## qc_type: " + qc_type);
+//   			System.out.println("########################## inven_item_num: " + inven_item_num);
+//   			System.out.println("########################## inven_amount: " + inven_amount);
+//   			System.out.println("########################## qc_num: " + qc_num);
 
-		// 값을 넣어줄 객체 생성
-		InventoryVO inven = new InventoryVO();
+   			// 값을 넣어줄 객체 생성
+   			InventoryVO inven = new InventoryVO();
 
-		// 객체에 값 set
-		
-		inven.setInven_name(inven_name);
-		// 타입
-			int inven_type = 0;
-			if (qc_type.equals("order")) {
-				inven_type = 0;
-			} else if (qc_type.equals("plan")) {
-				inven_type = 1;
-			}
-		inven.setInven_type(inven_type);
-		inven.setInven_item_num(inven_item_num);
-		inven.setInven_amount(inven_amount);
+   			// 객체에 값 set
+   			
+   			inven.setInven_name(inven_name);
+   			// 타입
+   				int inven_type = 0;
+   				if (qc_type.equals("order")) {
+   					inven_type = 0;
+   				} else if (qc_type.equals("plan")) {
+   					inven_type = 1;
+   				}
+   			inven.setInven_type(inven_type);
+   			inven.setInven_item_num(inven_item_num);
+   			inven.setInven_amount(inven_amount);
 
-		
-		// update 실행 (인벤토리 추가, qc 상태 업데이트)
-		int result1 = projectService.updateInven(inven);		
-			int qc_num = Integer.parseInt(map.get("qc_num"));
-		int result2 = projectService.updateQcStat2(qc_num);
-		
-		
-		// 부적격 재고 발생 시, [원자재 구매 계약서] 및 [제품 생산 계획서] 작성
-		
-		System.out.println("####################################### 인벤토리 업데이트 완료, 부적격 재고 처리 실행");
-		
-		// 필요 값 설정	
-		int paper_num = Integer.parseInt(map.get("paper_num"));
-		int totalFail = Integer.parseInt(map.get("totalFail"));
-		
-		MemberVO user = (MemberVO) session.getAttribute("user");
-				
-		System.out.println("####################################### paper_num 출력 ####### " + paper_num);
-		System.out.println("####################################### 총 부적격 수량 totalFail 출력 ####### " + totalFail);
-		System.out.println("####################################### type 출력 ####### " + inven_type);
-		
-		if (totalFail > 0) {
-			if (inven_type == 0) {
-				
-				OrderformVO of = projectService.getOrderformByPapernum(paper_num);
-				
-				int of_num = projectService.getLastOrderformNum() + 1;
-				String of_name = "[재신청] " + of.getOrderform_name();
-				String of_content = "[재신청] " + of.getOrderform_content();
-				
-				of.setOrderform_num(of_num);
-				of.setOrderform_name(of_name);
-				of.setOrderform_content(of_content);
-				
-				System.out.println("####################################### of 출력 #######" + of.toString());
-				
-				projectService.insertOrderform(of);
-				
-				OrderformDetailVO ofd = new OrderformDetailVO();
-				
-				ofd.setOrderform_num(of_num);
-				ofd.setProduct_num(inven_item_num);
-				
-				int amount = Integer.parseInt(map.get("totalFail"));
-				ofd.setOrderdetail_amount(amount);
-				
-				int price = projectService.getMaterialPrice(inven_item_num);
-				ofd.setOrderdetail_price(price * amount);
-				
-				
-				System.out.println("####################################### ofd 출력 #######" + ofd.toString());
-				
-				projectService.insertOrderformDetail(ofd);
-				
-			}
-			else if (inven_type == 1) {
-				
-				// 값 저장할 객체 생성
-				ProductionVO pd = new ProductionVO();
-				// production 값 가져오기
-				
-				// productiondetail 값 가져오기
-				
-				
-				
-				// set 해주기
-				
-				// 등록하기
-				
-				
-			}
-		};
-		
-		
-		// QcList로 이동
-		List<QcVO> QcList = projectService.getQcList();
-		redirectAttributes.addFlashAttribute("QcList", QcList);
-		redirectAttributes.addFlashAttribute("msg", "품질 검사서 제출 완료!");
-		log.info("qc 이동");
+   			
+   			// update 실행 (인벤토리 추가, qc 상태 업데이트)
+   			int result1 = projectService.updateInven(inven);		
+   				int qc_num = Integer.parseInt(map.get("qc_num"));
+   			int result2 = projectService.updateQcStat2(qc_num);
+   			
+   			
+   			// 부적격 재고 발생 시, [원자재 구매 계약서] 및 [제품 생산 계획서] 작성
+   			
+   			System.out.println("####################################### 인벤토리 업데이트 완료, 부적격 재고 처리 실행");
+   			
+   			// 필요 값 설정	
+   			int paper_num = Integer.parseInt(map.get("paper_num"));
+   			int totalFail = Integer.parseInt(map.get("totalFail"));
+   			
+   			MemberVO user = (MemberVO) session.getAttribute("user");
+   					
+   			System.out.println("####################################### paper_num 출력 ####### " + paper_num);
+   			System.out.println("####################################### 총 부적격 수량 totalFail 출력 ####### " + totalFail);
+   			System.out.println("####################################### type 출력 ####### " + inven_type);
+   			
+   			if (totalFail > 0) {
+   				if (inven_type == 0) {
+   					
+   					OrderformVO of = projectService.getOrderformByPapernum(paper_num);
+   					
+   					int of_num = projectService.getLastOrderformNum() + 1;
+   					String of_name = "[재신청] " + of.getOrderform_name();
+   					String of_content = "[재신청] " + of.getOrderform_content();
+   					
+   					of.setOrderform_num(of_num);
+   					of.setOrderform_name(of_name);
+   					of.setOrderform_stat("진행중");
+   					of.setOrderform_content(of_content);
+   					
+   					System.out.println("####################################### of 출력 #######" + of.toString());
+   					
+   					projectService.insertOrderform(of);
+   					
+   					OrderformDetailVO ofd = new OrderformDetailVO();
+   					
+   					ofd.setOrderform_num(of_num);
+   					ofd.setProduct_num(inven_item_num);
+   					
+   					int amount = Integer.parseInt(map.get("totalFail"));
+   					ofd.setOrderdetail_amount(amount);
+   					
+   					int price = projectService.getMaterialPrice(inven_item_num);
+   					ofd.setOrderdetail_price(price * amount);
+   					
+   					
+   					System.out.println("####################################### ofd 출력 #######" + ofd.toString());
+   					
+   					projectService.insertOrderformDetail(ofd);
+   					
+   				}
+   				else if (inven_type == 1) {
+   					
+   					// 객체 생성 + 기존 정보 가져오기
+   					ProductionVO pd = projectService.getProductionByPapernum(paper_num);
+   					
+   					int pd_num = projectService.getfindLastProductionNumber() + 1;
+   					String pd_writer = user.getMember_name();
+   					String pd_dept = user.getMember_dept();
+   					String pd_name = "[재신청] " + pd.getPd_name();
+   					String pd_content = "[재신청] " +  pd.getPd_content();		
+   					
+   					pd.setPd_num(pd_num);
+   					pd.setPd_writedate(null);
+   					pd.setPd_writer(pd_writer);
+   					pd.setPd_dept(pd_dept);
+   					pd.setPd_name(pd_name);
+   					pd.setPd_content(pd_content);
+   					
+   					System.out.println("####################################### pd 출력 #######" + pd.toString());
+   					// 위 코드를 출력하고 싶으면 DTO에서 @ToString 추가해주면 나옴 
+   					projectService.insertProduction(pd);
+   					
+   					// detail은 새로운 객체 생성
+   					ProductionDetailVO pdd = new ProductionDetailVO();
+   					int amount = Integer.parseInt(map.get("totalFail"));
+   					
+   					pdd.setPd_num(pd_num);
+   					pdd.setProduct_name(inven_name);
+   					pdd.setProductiondetail_amount(amount);
+   					
+   					System.out.println("####################################### pdd 출력 #######" + pdd.toString());
+   					// 위 코드를 출력하고 싶으면 DTO에서 @ToString 추가해주면 나옴 
+   					projectService.insertProductionDetail(pdd);
+   					
+   					
+   				}
+   			};
+   			
+   			
+   			// QcList로 이동
+   			List<QcVO> QcList = projectService.getQcList();
+   			redirectAttributes.addFlashAttribute("QcList", QcList);
+   			redirectAttributes.addFlashAttribute("msg", "품질 검사서 제출 완료!");
+   			log.info("qc 이동");
 
-		return "redirect:qc";
-	}
+   			return "redirect:qc";
+   		}
 
-	// QC 유형 등록 페이지 이동
-	@GetMapping("qcTypeReg")
-	public String qcTypeReg() {
-		log.info("qcTypeReg 이동");
-		return "qcTypeReg";
-	}
+   	// QC 유형 등록 페이지 이동
+   	@GetMapping("qcTypeReg")
+   	public String qcTypeReg() {
+   		log.info("qcTypeReg 이동");
+   		return "qcTypeReg";
+   	}
 
-	@GetMapping("ssong")
-	public String testssong() {
-		return "ssong";
-	}
-    
+   	@GetMapping("ssong")
+   	public String testssong() {
+   		return "ssong";
+   	}
+       
+   	// index QC Top 5 (7일간)
 
-
-// 박나현. 끝. ------------------------------
-
-
+   	
+   	
+   	
+   	
     //================ 김민성 ============================================================================
     
 	// 생산계획서 폼 upload
@@ -1542,27 +1610,39 @@ public class ProjectController {
 	 * return "redirect:factoryPlan"; }
 	 */
 	
+	//0203 김민성
 	@ResponseBody
 	@PostMapping("postFactoryDetail")
-	public int postFactoryDetail(@RequestParam("pd_num")int pd_num) {
-		log.info(pd_num+"");
+	public int postFactoryDetail(@RequestParam("pd_num")int pd_num,HttpSession session)throws Exception  {
+		log.info("pd_num: {}", pd_num);
+		MemberVO member = (MemberVO)session.getAttribute("user");//session
+		
+		
+		QcVO qc = new QcVO();
+		ProductVO productVO = new ProductVO();
+		ProductionVO productionVO = new ProductionVO(); 
+		 
 		List<InventoryVO> FinalInven = new ArrayList<>();
+		InventoryVO inven1 = new InventoryVO();
 		List<ProductionDetailVO> ProductionList = projectService.getProductionListByFactoryDetail(pd_num);
 		int ProductionListSize = ProductionList.size();
 		
-		for(int i = 1; i<=ProductionListSize;i++) {
-			String product_name = ProductionList.get(i-1).getProduct_name();
-			int productiondetail_amount = ProductionList.get(i-1).getProductiondetail_amount();
+		System.out.println("ProductionListSize"+ProductionListSize);
+		for(int i = 0; i< ProductionListSize;i++) {
+			String product_name = ProductionList.get(i).getProduct_name(); 
+			int productiondetail_amount = ProductionList.get(i).getProductiondetail_amount();
 			int recipe_num = projectService.getFindRecipeNum(product_name);
 			
 			List<InventoryVO> RecipeTotalList = new ArrayList<>();
-			
+			System.out.println("recipe_num"+recipe_num);
 			List<RecipeDetailVO> RecipeList = projectService.getRecipeDetailListByRecipeNum(recipe_num);
-			int RecipeListSize =RecipeList.size();
+			int RecipeListSize = RecipeList.size();
+			log.info("RecipeList size for product {}: {}", product_name, RecipeListSize);
 			
-			for(int l =1; l <=RecipeListSize;l++) {
-				int Material_amount = RecipeList.get(l-1).getMaterial_amount();
-				String Material_name = RecipeList.get(l-1).getMaterial_name();
+			
+			for(int l =0; l < RecipeListSize;l++) {
+				int Material_amount = RecipeList.get(l).getMaterial_amount();
+				String Material_name = RecipeList.get(l).getMaterial_name();
 				
 				int TotalAmount = Material_amount * productiondetail_amount;
 				InventoryVO inven = new InventoryVO();
@@ -1570,35 +1650,103 @@ public class ProjectController {
 				inven.setInven_amount(TotalAmount);
 				inven.setInven_name(Material_name);
 				RecipeTotalList.add(inven);
+			}	
 				
-			}
-			List<InventoryVO> list = projectService.getFindInvenList(product_name);
-			int listSize = list.size();
-			for(int k =1; k <= listSize; k++) {
-				int totalamount = RecipeList.get(k-1).getMaterial_amount();
-				String Mname = RecipeList.get(k-1).getMaterial_name();
-				
-				int Inven_amount =list.get(k-1).getInven_amount();
-				String Inven_name = list.get(k-1).getInven_name();
-				
-				if(Mname.equals(Inven_name)) {
-					int Total = Inven_amount - totalamount;
-					if( Total <= Inven_amount) {
-						InventoryVO inven = new InventoryVO();
+				List<InventoryVO> list = projectService.getFindInvenList();
+				log.info(product_name);
+				int listSize = list.size();
+				for(int k =0; k < listSize; k++) {
+					int Inven_amount =list.get(k).getInven_amount();
+					String Inven_name = list.get(k).getInven_name();
+					inven1.setInven_amount(Inven_amount);
 						
-						inven.setInven_amount(Total);
-						inven.setInven_name(Inven_name);
-						FinalInven.add(inven);
-					}else {
-						return 1; //재고 부족
-					}
+						for(int j = 0; j<RecipeListSize; j++ ) {
+							String Mname = RecipeTotalList.get(j).getInven_name();
+							int totalamount = RecipeTotalList.get(j).getInven_amount();
+							System.out.println("3");
+							if(Mname.equals(Inven_name)) {
+								
+								int Total = Inven_amount - totalamount;
+								
+								System.out.println("4");
+								if( Total < 0) {
+									return 1; //재고 부족
+								}else {
+									
+									inven1.setInven_amount(Total);
+									inven1.setInven_name(Inven_name);
+									System.out.println("5");
+									FinalInven.add(inven1);
+								}
+						}
 				}
 			}// for 끝나는 부분 원자재 수 기준
 		}//for 끝나는부분 제품 수 기준
-		for(InventoryVO LastInven : FinalInven) { //fianlInven 이 vo LastInven으로 for 를 돌린다.
-		int r = projectService.reduceInventoryAmount(LastInven);
+		
+		
+		
+		
+		
+		List<InventoryVO> exam = projectService.getFindInvenList();
+		for (InventoryVO lists : exam) { 
+		    for (InventoryVO finalInven : FinalInven) { 
+		        // 두 배열의 inven_name이 같은 경우 처리
+		        if (finalInven.getInven_name().equals(lists.getInven_name())) { 
+		        	
+		        	
+		            // 최신화: exam의 inven_amount에서 FinalInven의 inven_amount를 빼기
+		            int updatedAmount = lists.getInven_amount() - finalInven.getInven_amount(); 
+		            
+		            
+		            // 음수 방지
+		            if (updatedAmount < 0) {
+		                System.out.println("Error: Insufficient inventory for " + finalInven.getInven_name());
+		               
+		                return 1;
+		            } 
+
+		            // exam 리스트의 inven_amount를 최신화
+		            lists.setInven_amount(updatedAmount);
+
+		            // 최종 결과 확인 (디버깅용 로그)
+		            System.out.println("Updated " + lists.getInven_name() + " Amount: " + updatedAmount);
+		        }
+		    }
+		} 
+		for (InventoryVO lists : exam) { 
+			int r = projectService.reduceInventoryAmount(lists);
+			if (r != 1) {
+		        System.out.println("실패 " );
+		        return 1; // 실패 시 반환
+		        
+		    }
 		}
-		return 2; //완료
+		
+		
+		
+		  
+		/*
+		 * productVO.setProduct_name(finalInven.getInven_name());
+		 * 
+		 * projectService.getfindProductNum(productVO); ProductVO Product_num =
+		 * projectService.getfindProductNum(productVO); qc.setPaper_num(pd_num);
+		 * productVO.setProduct_name(finalInven.getInven_name());
+		 * qc.setQc_item_num(Product_num.getProduct_num());
+		 * qc.setQc_quan(finalInven.getInven_amount());
+		 * qc.setQc_writer(member.getMember_name()); qc.setQc_type("plan");
+		 * 
+		 * int result2 = projectService.insertqc(qc);
+		 */
+		
+		
+		productionVO.setPd_num(pd_num);
+		
+		
+		
+		 
+		int pd_check = projectService.setPdCheckUpdate(productionVO);
+		System.out.println("생산 성공");
+		return 2;
 	}
 	
 	
@@ -1619,8 +1767,9 @@ public class ProjectController {
 	
 	
 	 
-	 @GetMapping("/getInventoryByProductName")
-	    public ResponseEntity<List<RecipeVO>> getInventoryByProductName(@RequestParam("product_name") String product_name,
+	//0203 김민성
+	@GetMapping("/getInventoryByProductName")
+	public ResponseEntity<List<RecipeVO>> getInventoryByProductName(@RequestParam("product_name") String product_name,
 	    														  @RequestParam("amount") String amount) {
 		
 		List<RecipeDetailVO> list = projectService.getTotalAmount(product_name);
@@ -1652,10 +1801,11 @@ public class ProjectController {
 	        recipe.setMaterial_amount(Amount);
 	        recipe.setMaterial_name(Mname);
 	        recipes.add(recipe); // 결과를 리스트에 추가
-			}
+		}
+		
 		return ResponseEntity.ok(recipes);
 	       
-	    }
+	}
 
 	 	
 		/* 원본

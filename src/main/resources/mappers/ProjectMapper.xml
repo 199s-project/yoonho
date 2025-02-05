@@ -375,7 +375,41 @@
 		VALUES (#{pd_num}, #{product_name}, #{productiondetail_amount});		
 	</insert>
 	
-<!-- 나현. 끝. -->
+	<!-- 2025.01.03 대시보드 -->
+	
+	<!-- 대시보드, 원자재 부적격률 내림차순 5위 (7일간) -->
+	<select id="QcMDashTop5" resultType="QcDashVO">
+	select sub.qc_item_num as item_num, sub.item_name as item_name, sum(sub.total) as total, sum(sub.total_fail) as total_fail, ROUND(SUM(sub.total_fail) / SUM(sub.total) * 100, 2) as fail_per
+	from (select qc.qc_num, qc.qc_item_num, m.material_name as item_name, qc.qc_quan as total, sum(qd.qc_fail_quan) as total_fail, qc.qc_date
+			from qc
+			left join qc_detail qd on qc.qc_num = qd.qc_num
+	        left join material m on qc.qc_item_num = m.material_num
+			where qc.qc_type = "order"
+				and qc.qc_stat = 2
+	            and datediff(now(), qc.qc_date) &lt; 7
+			group by qc.qc_num) as sub
+	group by sub.qc_item_num
+	order by fail_per desc
+	limit 5;
+	</select>	
+	
+		<!-- 대시보드, 상품 부적격률 내림차순 5위 (7일간) -->
+	<select id="QcPDashTop5" resultType="QcDashVO">
+	select sub.qc_item_num as item_num, sub.item_name, sum(sub.total) as total, sum(sub.total_fail) as total_fail, ROUND(SUM(sub.total_fail) / SUM(sub.total) * 100, 2) as fail_per
+	from (select qc.qc_num, qc.qc_item_num, p.product_name as item_name, qc.qc_quan as total, sum(qd.qc_fail_quan) as total_fail, qc.qc_date
+			from qc
+			left join qc_detail qd on qc.qc_num = qd.qc_num
+	        left join product p on qc.qc_item_num = p.product_num
+			where qc.qc_type = "plan"
+				and qc.qc_stat = 2
+	            and datediff(now(), qc.qc_date) &lt; 7
+			group by qc.qc_num) as sub
+	group by sub.qc_item_num
+	order by fail_per desc
+	limit 5;
+	</select>	
+	
+<!-- 나현. 끝. -->	
 	
 <!-- 김윤호 =========================================================김윤호================================ -->	
 
@@ -531,7 +565,27 @@
 		LIMIT #{start}, #{productPageSIZE}
 	</select>
 	
+	<select id="getRecentProduceInformations" parameterType="java.lang.Integer" resultType="RecentSalesVO">
+		select any_value(regdate) regdate, any_value(diff) diffdate, sum(final) as totalproduce, case dayname
+			WHEN '1' THEN '일'
+			WHEN '2' THEN '월'
+			WHEN '3' THEN '화'
+			WHEN '4' THEN '수'
+			WHEN '5' THEN '목'
+			WHEN '6' THEN '금'
+			WHEN '7' THEN '토'
+		end as dayname from (
+			select qc_date as regdate, qc_item_num, final, diff, dayname from (
+				select q.*, A.totalfail, (q.qc_quan - A.totalfail) final, datediff(now(),q.qc_date) diff, dayofweek(q.qc_date) dayname from qc q, (
+					select qc_num, sum(qc_fail_quan) totalfail from qc_detail group by qc_num
+				) A 
+				where q.qc_num = A.qc_num and qc_type = "plan" and qc_stat = 2 
+			) B
+			where B.diff &lt; #{day} 
+		) C
+		group by dayname order by diffdate;
 	
+	</select>
 	
 	
 	
@@ -630,11 +684,28 @@
 	</select>
 	
 	<select id="getFindInvenList" parameterType="ProductionDetailVO">
-		   SELECT * FROM inventory WHERE inven_name IN
-    	<foreach collection="ProductionList" item="product_name" open="(" separator="," close=")">
-      	  #{product_name}
-    	</foreach>
+		SELECT * FROM inventory
 	</select>
+	
+	
+	
+	<select id = "getPdCheckCount1" resultType="int">
+    	select 
+    	 count(pd_check) AS black
+    	 from production where pd_check = 1;
+    </select>
+    
+        <select id = "getPdCheckCount2" resultType="int">
+    	select 
+    	 count(pd_check) AS white
+    	 from production where pd_check = 0;
+    </select>
+    
+    <select id="getLastProduction" resultType="ProductionVO">
+    	SELECT * FROM production ORDER BY pd_num DESC limit 5;
+    </select>
+	
+	
 	
 <!-- 김민성 ========================================================================================= -->	
 	
@@ -697,8 +768,8 @@
 	
 	<select id="getOrderformDetailListByOrderformnum" parameterType="int">
 		select *
-		from orderformdetail
-		where orderform_num = #{orderform_num}
+		from orderformdetail o, material m
+		where o.orderform_num = #{orderform_num} and o.product_num = m.material_num;
 	</select>
 	
 	<select id="materialCodeCheck" parameterType="String" resultType="java.lang.Integer">
@@ -848,7 +919,102 @@
 		where orderform_num = #{orderform_num}
 	</update>
 	
+	<update id="insertOrderformCode" parameterType="java.util.Map">
+		update orderform
+		set
+		orderform_code = #{code}
+		where orderform_num = #{orderform_num}
+	</update>
+	
+	<update id="updateInventoryAppropriateAmount" parameterType="InventoryVO">
+		update inventory
+		set inven_appropriate_amount = {inven_appropriate_amount}
+		where inven_num = {inven_num}
+	</update>
+	
+	<select id="materialNameCheck" parameterType="String" resultType="java.lang.Integer">
+		select count(*) from material where material_name = #{material_name}
+	</select>
+	
+	<select id="getInventoryAppropriateAmount" resultType="InventoryAppropriateAmountVO">
+		select rd.material_name, 
+		SUM(qd.quotdetail_amount * rd.material_amount) AS total_material_amount,
+		round(SUM(qd.quotdetail_amount * rd.material_amount) * 0.1)  AS appropriate_amount
+		
+		from quotation q ,  quotationdetail qd, product p, recipe r, recipedetail rd
+		where q.quot_enddate &gt;= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
+		AND q.quot_enddate &lt; DATE_FORMAT(NOW(), '%Y-%m-01')
+		AND q.quot_num = qd.quot_num
+		ANd qd.product_num = p.product_num
+		AND p.product_code = r.product_code
+		AND r.recipe_num = rd.recipe_num
+		group by rd.material_name;
+	</select>
+	
+	<update id="addAppropriateAmount" parameterType="java.util.Map">
+		UPDATE inventory
+		SET
+		inven_appropriate_amount = #{recipe-input2}
+		WHERE inven_name = #{recipe-input1}
+	</update>
+	
+	<select id="getAllAvgMaterialprice" resultType="AvgMaterialpriceVO">
+		select product_num,
+		round(avg(orderdetail_price / orderdetail_amount)) AS average_material_price
+		from orderformdetail
+		group by product_num
+	</select>
+	
+	<select id="getOneAvgMaterialprice" parameterType="int" resultType="AvgMaterialpriceVO">
+		select product_num,
+		round(avg(orderdetail_price / orderdetail_amount)) AS average_material_price
+		from orderformdetail
+		where product_num = #{product_num}
+		group by product_num
+	</select>
+	
+	<select id="getOrderformWriter" parameterType="int" resultType="String">
+		select orderform_writer
+		from orderform
+		where orderform_num = #{orderform_num}
+	</select>
+	
+	<update id="updateMaterialInvenPrice" parameterType="AvgMaterialpriceVO">
+		UPDATE inventory
+		SET
+		inven_price = #{average_material_price}
+		WHERE inven_item_num = #{product_num}
+		AND inven_type = 0
+	</update>
+	
 	
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@new 작업공간@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 이의재  끝 -->
+
+	<delete id="deleteOrderform" parameterType="int">
+		delete from orderform
+		where orderform_num = #{orderform_num}
+	</delete>
+	
+	<delete id="deleteOrderformDetail" parameterType="int">
+		delete from orderformdetail
+		where orderform_num = #{orderform_num}
+	</delete>
+
+	<select id="getInventoryProductAppropriateAmount" resultType="InventoryProductAppropriateAmountVO">
+		select p.product_name, 
+		SUM(qd.quotdetail_amount) AS total_amount,
+		round(SUM(qd.quotdetail_amount) * 0.1)  AS appropriate_amount
+		
+		from quotation q ,  quotationdetail qd, product p, recipe r, recipedetail rd
+		where q.quot_enddate &gt;= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
+		AND q.quot_enddate &lt; DATE_FORMAT(NOW(), '%Y-%m-01')
+		AND q.quot_num = qd.quot_num
+		ANd qd.product_num = p.product_num
+		AND p.product_code = r.product_code
+		AND r.recipe_num = rd.recipe_num
+		group by p.product_name;
+	</select>
+
+
 
 </mapper>

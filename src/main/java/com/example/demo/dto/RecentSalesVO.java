@@ -18,4 +18,5 @@ public class RecentSalesVO {
 	private String regdate;
 	private String dayname;
 	
+	private int totalproduce;
 }

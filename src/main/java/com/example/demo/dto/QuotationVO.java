@@ -27,6 +27,7 @@ public class QuotationVO {
 	private int quotdetail_price;
 	private int total_price;
 	private String this_num;
+	private String discord;
 	
 	//orderform vo
 	private int orderform_num;
