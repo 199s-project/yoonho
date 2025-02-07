@@ -145,7 +145,7 @@ window.addEventListener('DOMContentLoaded', function onload() {
 				    <table class="input-auto-size">
 				        <tr>
 				            <td class="heading-section" width="15%">계약 번호</td>
-				            <td colspan="4"><th:block th:text="${code}"></th:block></td>
+				            <td colspan="4"><th:block th:text="${orderformVO.orderform_code}"></th:block></td>
 				        </tr>
 				        <tr height="50px">
 				            <td class="heading-section">발주처</td>
@@ -182,7 +182,7 @@ window.addEventListener('DOMContentLoaded', function onload() {
 					    </tr>
 					    <tr th:each="orderformDetailVO : ${orderformDetailListVO}">
 					        <td class="rownum" style="text-align: right; padding-right: 15px;"><th:block th:text="${orderformDetailVOStat.count}"></th:block></td>
-					        <td><th:block th:text="${orderformDetailVO.product_num}"></th:block></td>
+					        <td><th:block th:text="${orderformDetailVO.material_name}"></th:block></td>
 					        <td class="unit_price"><span id="unit_price" onload="onload()"></span></td>
 					        <td class="quantity"><th:block id="quantity" name="quantity" th:text="${orderformDetailVO.orderdetail_amount}"></th:block></td>
 					        <td class="total_price"><th:block id="total_price" name="total_price" th:text="${orderformDetailVO.orderdetail_price}"></th:block></td>
@@ -231,7 +231,7 @@ window.addEventListener('DOMContentLoaded', function onload() {
 			
 			
 			<div class="footer-wrap pd-20 mb-20 card-box">
-				DeskApp - Bootstrap 4 Admin Template By <a href="https://github.com/dropways" target="_blank">Ankit Hingarajiya</a>
+				we are all 1995's  <a href="" target="_blank">Suit</a>
 			</div>
 		</div>
 	</div>

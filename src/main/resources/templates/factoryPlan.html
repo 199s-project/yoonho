@@ -57,6 +57,12 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 	display: none !important;
 }
 
+div.dataTables_filter {
+	width: 500px;
+	float: right;
+	margin: 0 16px 10px 0;
+}
+
 </style>
 
 </head>
@@ -81,7 +87,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
                      </nav>
                   </div>
                   <div class="col-md-6 col-sm-12 text-right">
-                     
+                     <button th:onclick="|location.href='@{productionForm}'|" value="생산 계획서 작성" class="btn btn-primary m-2 rowbtn">생산 계획서 작성</button>
                   </div>
                </div>
             </div>
@@ -90,8 +96,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
             <div class="card-box mb-30">
             
                <div class="pd-20 d-flex align-items-center justify-content-between">
-   					<h4 class="text-blue h4">공장 작업List</h4>
-    				<button th:onclick="|location.href='@{productionForm}'|" value="생산 계획서 작성" class="btn btn-primary m-2 rowbtn">생산 계획서 작성</button>
+    				
 			   </div>
                
                <div class="pb-20">

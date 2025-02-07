@@ -149,77 +149,74 @@ public class ProjectService {
     
     // 구매계약서 등록
     public ModelAndView postOrderformRegister(Map<String,Object> map) throws Exception {
-    	mv = new ModelAndView();
-    	CompanyVO company1 = projectDAO.getCompanyByCompanyName((String)map.get("company1"));
-    	CompanyVO company2 = projectDAO.getCompanyByCompanyName((String)map.get("company2"));
-    	
-    	System.out.println(map);
-    	OrderformVO orderformVO = new OrderformVO();
-    	orderformVO.setOrderform_name((String)map.get("orderform_name"));
-    	orderformVO.setOrderform_stat((String)map.get("orderform_stat"));
-    	orderformVO.setCompany_num(company1.getCompany_num());
-    	orderformVO.setCompany_num2(company2.getCompany_num());
-    	orderformVO.setOrderform_content((String)map.get("content"));
-    	orderformVO.setOrderform_startDate((String)map.get("start_date"));
-    	orderformVO.setOrderform_endDate((String)map.get("end_date"));
-    	
-    	int r = projectDAO.insertOrderform(orderformVO);
-    	
-    	int OrderformLastNum = projectDAO.getLastOrderformNum();
-    	
-    	Map<String,Object> itemData = map.entrySet()
-    			.stream()
-    			.filter(entry -> entry.getKey().contains("item"))
-    			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    	
-    	Optional<Integer> itemMaxNumber = itemData.keySet()
-    			.stream()
-    			.filter(key -> key.startsWith("item"))
-    			.map(key -> Integer.parseInt(key.replace("item", "")))
-    			.max(Integer::compareTo);
-    	
-    	int itemMaxNumberint = itemMaxNumber.orElse(0);
-    	
-    	OrderformDetailVO orderformDetailVO = new OrderformDetailVO();
-    	PaymentMaterialVO inventoryMaterialVO = new PaymentMaterialVO();
-    	QcVO qcVO = new QcVO();
-    	
-    	for(int i=1; i <= itemMaxNumberint; i++) {
-    		String itemkey = "item" + i;
-    		String itemvalue = (String)map.get(itemkey);
-    		MaterialVO materialVO = projectDAO.getMaterialByMaterialName(itemvalue);
-    		int material_num = materialVO.getMaterial_num();
-    		
-    		String amountkey = "quantity" + i;
-    		String amountvalue = (String)map.get(amountkey);
-    		int amountvalueInt = Integer.parseInt(amountvalue);
-    		
-    		String pricekey = "total_price" + i;
-    		String pricevalue = (String)map.get(pricekey);
-    		int pricevalueInt = Integer.parseInt(pricevalue);
-    		orderformDetailVO.setOrderform_num(OrderformLastNum);
-	    	orderformDetailVO.setProduct_num(material_num);
-	    	orderformDetailVO.setOrderdetail_amount(amountvalueInt);
-	    	orderformDetailVO.setOrderdetail_price(pricevalueInt);
-	    	
-	    	int result = projectDAO.insertOrderformDetail(orderformDetailVO);
-	    	
-	    	qcVO.setQc_type("order");
-	    	qcVO.setPaper_num(OrderformLastNum);
-	    	qcVO.setQc_writer("test");
-	    	qcVO.setQc_item_num(materialVO.getMaterial_num());
-	    	qcVO.setQc_quan(Integer.parseInt(amountvalue));
-	    	
-	    	int result2 = projectDAO.insertqc(qcVO);
-	    	
-    	}
-    	
-    	
-    	
-    	
-    	mv.addObject("msg", "계약서 등록 완료");
-    	mv.setViewName("purchaseContract");
-    	return mv;
+       mv = new ModelAndView();
+       CompanyVO company1 = projectDAO.getCompanyByCompanyName((String)map.get("company1"));
+       CompanyVO company2 = projectDAO.getCompanyByCompanyName((String)map.get("company2"));
+       
+       OrderformVO orderformVO = new OrderformVO();
+       orderformVO.setOrderform_name((String)map.get("orderform_name"));
+       orderformVO.setOrderform_stat((String)map.get("orderform_stat"));
+       orderformVO.setCompany_num(company1.getCompany_num());
+       orderformVO.setCompany_num2(company2.getCompany_num());
+       orderformVO.setOrderform_writer((String)map.get("orderform_writer"));
+       orderformVO.setOrderform_content((String)map.get("content"));
+       orderformVO.setOrderform_startDate((String)map.get("start_date"));
+       orderformVO.setOrderform_endDate((String)map.get("end_date"));
+       
+       int r = projectDAO.insertOrderform(orderformVO);
+       
+       int OrderformLastNum = projectDAO.getLastOrderformNum();
+
+       OrderformVO updatedOrderform = projectDAO.getOrderformByOrderformnum(OrderformLastNum);
+       
+       String code1 = updatedOrderform.getOrderform_regdate().substring(0,10).replaceAll("-", "");
+       String code2 = String.format("%04d", OrderformLastNum % 1000);
+       String code3 = String.format("%04d", updatedOrderform.getCompany_num2() % 1000);
+       String code = code1 + code2 + code3;
+       
+       int s = projectDAO.insertOrderformCode(OrderformLastNum, code);
+       
+       Map<String,Object> itemData = map.entrySet()
+             .stream()
+             .filter(entry -> entry.getKey().contains("item"))
+             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+       
+       Optional<Integer> itemMaxNumber = itemData.keySet()
+             .stream()
+             .filter(key -> key.startsWith("item"))
+             .map(key -> Integer.parseInt(key.replace("item", "")))
+             .max(Integer::compareTo);
+       
+       int itemMaxNumberint = itemMaxNumber.orElse(0);
+       
+       OrderformDetailVO orderformDetailVO = new OrderformDetailVO();
+       PaymentMaterialVO inventoryMaterialVO = new PaymentMaterialVO();
+       QcVO qcVO = new QcVO();
+       
+       for(int i=1; i <= itemMaxNumberint; i++) {
+          String itemkey = "item" + i;
+          String itemvalue = (String)map.get(itemkey);
+          MaterialVO materialVO = projectDAO.getMaterialByMaterialName(itemvalue);
+          int material_num = materialVO.getMaterial_num();
+          
+          String amountkey = "quantity" + i;
+          String amountvalue = (String)map.get(amountkey);
+          int amountvalueInt = Integer.parseInt(amountvalue);
+          
+          String pricekey = "total_price" + i;
+          String pricevalue = (String)map.get(pricekey);
+          int pricevalueInt = Integer.parseInt(pricevalue);
+          orderformDetailVO.setOrderform_num(OrderformLastNum);
+          orderformDetailVO.setProduct_num(material_num);
+          orderformDetailVO.setOrderdetail_amount(amountvalueInt);
+          orderformDetailVO.setOrderdetail_price(pricevalueInt);
+          
+          int result = projectDAO.insertOrderformDetail(orderformDetailVO);
+          
+       }
+       mv.addObject("msg", "계약서 등록 완료");
+       mv.setViewName("purchaseContract");
+       return mv;
     }
     
     
@@ -457,7 +454,17 @@ public class ProjectService {
 	}
 		
 	// 나현. 끝.
-
+	
+	// 25-02-05 pd_check = 2
+	
+	public int ReinsertProduction(ProductionVO productionVO) {
+		return projectDAO.ReinsertProduction(productionVO);
+	}
+	
+	public String getOrderformCode(int orderform_num) {
+		return projectDAO.getOrderformCode(orderform_num);
+	}
+	
 
 
 	// -----------------------------------------------------------------------------
@@ -802,7 +809,7 @@ public class ProjectService {
 	
 	public ModelAndView getRecipe() {
 		mv = new ModelAndView();
-		List<RecipeVO> recipeVOList = projectDAO.getRecipeList();
+		List<RecipeVO> recipeVOList = projectDAO.getRecipeList1();
 		
 		mv.addObject("recipeVOList",recipeVOList);
 		mv.setViewName("recipe");
@@ -924,7 +931,7 @@ public class ProjectService {
 	
 	public int setproductionForm(List<ProductionDetailVO> list) {
 		// TODO Auto-generated method stub
-		return projectDAO.insertproductiondetail(list);
+		return projectDAO.setproductionForm(list);
 	}
 	
 	public int insertProduction(ProductionVO productionVO) {
@@ -955,9 +962,9 @@ public class ProjectService {
 		return projectDAO.getRecipeDetailListByRecipeNum(recipe_num);
 	}
 	
-	public int reduceInventoryAmount(InventoryVO inventoryVO) {
+	public int reduceInventoryAmount(InventoryVO lists) {
 		
-		return projectDAO.reduceInventoryAmount(inventoryVO);
+		return projectDAO.reduceInventoryAmount(lists);
 	}
 
 	public int setPdCheckUpdate(ProductionVO productionVO) {
@@ -1000,9 +1007,9 @@ public class ProjectService {
 		return projectDAO.getProductionDetail(pd_num);
 	}
 
-	public List<RecipeDetailVO> getRecipeDetailList() {
+	public List<RecipeDetailVO> getRecipeList() {
 		// TODO Auto-generated method stub
-		return projectDAO.getRecipeDetailList();
+		return projectDAO.getRecipeList();
 	}
 
 	public  InventoryVO getInvenAmount(String Mname) {
@@ -1024,7 +1031,8 @@ public class ProjectService {
 		// TODO Auto-generated method stub
 		return projectDAO.getFindInvenList();
 	}
-		
+
+	
 	//0203
 	public Map<String,Object> getPdCheckCounts() {
 		return projectDAO.getPdCheckCounts();
@@ -1043,7 +1051,43 @@ public class ProjectService {
 	public List<ProductionVO> getLastProduction() {
 		// TODO Auto-generated method stub
 		return projectDAO.getLastProduction();
-	}	
+	}
+
+	public int setPdCheckUpdate2(ProductionVO productionVO) {
+		// TODO Auto-generated method stub
+		return projectDAO.setPdCheckUpdate2(productionVO);
+	}
+
+	public List<ProductionVO> getFatoryWorkList1() {
+		// TODO Auto-generated method stub
+		return projectDAO.getFatoryWorkList1();
+	}
+
+	public int setPdCheckUpdate3(ProductionVO productionVO) {
+		// TODO Auto-generated method stub
+		return projectDAO.setPdCheckUpdate3(productionVO);
+	}
+
+	public int setPdCheckUpdate4(ProductionVO productionVO) {
+		// TODO Auto-generated method stub
+		return projectDAO.setPdCheckUpdate4(productionVO);
+	}
+
+	public List<ProductionVO> getFatoryWorkList2() {
+		// TODO Auto-generated method stub
+		return projectDAO.getFatoryWorkList2();
+	}
+
+	public int setDeleteProduction(ProductionVO productionVO) {
+		// TODO Auto-generated method stub
+		return projectDAO.setDeleteProduction(productionVO);
+	}
+
+	public int setDeleteProduction2(ProductionVO productiondetailVO) {
+		// TODO Auto-generated method stub
+		return projectDAO.setDeleteProduction2(productiondetailVO);
+	}
+
 		
 // ---------------------김민성---------------------------------	
 	

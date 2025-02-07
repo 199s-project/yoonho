@@ -1,6 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout/layout1.html}"
+	  th:fragment="html">
 <head>
+
 <script>
 function func(member_dept){
 	document.production.selectdept.value=member_dept;
@@ -115,22 +120,22 @@ function func(member_dept){
 
 var count = 2;
 
-function addrow() {
+ function addrow() {
 	
 	const elem = document.createElement("tr");
 	
 	elem.classList.add('added-row'+count);
 	elem.innerHTML = `
         <td class="rownum">`+count+`</td>
-        <td><input type="text" name="item_name` + count + `"></td>
-        <td><input type="number" name="quantity` + count + `" class="amount-number" min=1 value=1></td>
+        <td><input type="text" id="item_name` + count + `" name="item_name` + count + `" class="autocomplete-product" placeholder="제품명을 입력하세요." onchange="getProduct(event)"></td>
+        <td><input type="number" id="quantity` + count + `" name="quantity` + count + `" class="amount-number"  onchange="rowquantityChange(event)" min=1 value=1></td>
 	`;
 	count++;
 	document.querySelector(".products").appendChild(elem);
 	document.getElementById("maxCount").value= count -1;
-}
+} 
 
-function deleterow() {
+ function deleterow() {
 	
 	if (count>2) {
 	    const table = document.getElementById('products');
@@ -138,16 +143,54 @@ function deleterow() {
 	    table.deleteRow(count);
 	    document.getElementById("maxCount").value = count -1;
 	}
-}
+} 
 
-async function addProductList(event){
+
+
+
+
+
+
+
+  async function rowquantityChange(event) {
+    const currentInput = event.target;
+    const currentId = currentInput.id;
+    const currentAmount = currentInput.value.trim();
+    const count = currentId.replace('quantity', '');
+    const item_name = document.getElementById(`item_name${count}`).value;
+    const response = await fetch(`/getInventoryByProductName?product_name=${item_name}&amount=${currentAmount}`);
+    
+    // const response = await fetch(`/getInventoryByProductName?product_name=${item_name}`);
+    //const inventory = await response.json();
+    const recipes = await response.json();
+    
+    recipes.forEach(recipe => {
+        if (recipe.material_amount < 0) {
+            hasError = true; // 재고 부족이 있음을 표시
+            Swal.fire({
+                icon: 'error',
+                title: '재고가 부족합니다.',
+                text: `${item_name}: ${recipe.material_name}의 재고가 부족합니다.`,
+            });
+        }
+    });
+    if (hasError) {
+        const firstNegativeRecipe = recipes.find(recipe => recipe.material_amount < 0);
+        if (firstNegativeRecipe) {
+            // 부족한 재고의 최대 허용 가능한 값으로 조정
+            currentInput.value = Math.floor(currentAmount);
+        }
+    }
+} 
+
+
+ 
+
+ 
+    
+
+				
 	
-	
-	
-}
-
-
-
 </script>
 
 
@@ -163,29 +206,17 @@ async function addProductList(event){
 			<div class="min-height-200px">
 				<div class="page-header">
 					<div class="row">
-						<div class="col-md-6 col-sm-12">
-							<div class="title">
-								<h4>DataTable</h4>
-							</div>
-							<nav aria-label="breadcrumb" role="navigation">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">DataTable</li>
-								</ol>
-							</nav>
-						</div>
-						<div class="col-md-6 col-sm-12 text-right">
-							<div class="dropdown">
-								<a class="btn btn-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-									January 2018
-								</a>
-								<div class="dropdown-menu dropdown-menu-right">
-									<a class="dropdown-item" href="#">Export List</a>
-									<a class="dropdown-item" href="#">Policies</a>
-									<a class="dropdown-item" href="#">View Assets</a>
-								</div>
-							</div>
-						</div>
+						 <div class="col-md-6 col-sm-12">
+                     <div class="atitle">
+                        <h4>생산 계약서 Form</h4>
+                     </div>
+                     <nav aria-label="breadcrumb" role="navigation">
+                        <ol class="breadcrumb">
+                           <li class="breadcrumb-item"><a href="index">Home</a></li>
+                           <li class="breadcrumb-item active" aria-current="page">생산 계약서 Form</li>
+                        </ol>
+                     </nav>
+                  </div>
 					</div>
 				</div>
 				
@@ -212,11 +243,11 @@ async function addProductList(event){
 					   
 					     <tr>
 					        <td class="heading-section" width="15%">생산 시작일</td>
-					        <td colspan="3"><input type="date" id="pd_startdate" name="pd_startdate" size="60"></td>
+					        <td colspan="3"><input type="date" id="pd_startdate" name="pd_startdate" size="60" required></td>
 					    </tr>
 					     <tr>
 					        <td class="heading-section" width="15%">생산 마감일</td>
-					        <td colspan="3"><input type="date" id="pd_enddate" name="pd_enddate" size="60"></td>
+					        <td colspan="3"><input type="date" id="pd_enddate" name="pd_enddate" size="60" required></td>
 					    </tr>
 					</table>
 					
@@ -231,8 +262,8 @@ async function addProductList(event){
 					    </tr>
 					    <tr class="added-row1">
 					        <td style="text-align: right; padding-right: 15px;">1</td>
-					        <td><input type="text" id = "item_name1"name="item_name1"></td>
-					        <td><input type="number" id="quantity1"name="quantity1" class="amount-number" min=1 value=1 style="text-align: right;"></td>
+					        <td><input type="text" id="item_name1" name="item_name1" class="autocomplete-product" placeholder="제품명을 입력하세요." onchange="getProduct(event)" required></td>
+					        <td><input type="number" id="quantity1" name="quantity1" class="amount-number" onchange="rowquantityChange(event)" min=1 value=1  required style="text-align: right;"></td>
 					    </tr>
 
 					    <!-- Add more rows as needed -->
@@ -241,11 +272,11 @@ async function addProductList(event){
 					<table class="input-auto-size">
 					     <tr>
 					        <td class="heading-section">생산 목적</td>
-					        <td colspan="3"><input type="text" id="pd_name" name="pd_name" size="60"></td>
+					        <td colspan="3"><input type="text" id="pd_name" name="pd_name" size="60" required></td>
 					    </tr>
 					    <tr>
 					        <td class="heading-section" style="text-align: center;">비고</td>
-					        <td><textarea id="pd_content" name="pd_content" rows="10" style="width: 100%;"></textarea></td>
+					        <td><textarea id="pd_content" name="pd_content" rows="10" style="width: 100%;" required></textarea></td>
 					    </tr>
 					</table>
 					<button type="submit" value="제출하기" class="btn btn-primary m-2 rowbtn">제출</button>
@@ -261,18 +292,19 @@ async function addProductList(event){
 				
 				<!-- Export Datatable End -->
 			</div>
-			
-			
+
 			
 			
 			
 			
 			<div class="footer-wrap pd-20 mb-20 card-box">
-				DeskApp - Bootstrap 4 Admin Template By <a href="https://github.com/dropways" target="_blank">Ankit Hingarajiya</a>
+				we are all 1995's  <a href="" target="_blank">Suit</a>
 			</div>
 		</div>
 	</div>
 	<!-- js -->
+
+	   
 	<script src="vendors/scripts/core.js"></script>
 	<script src="vendors/scripts/script.min.js"></script>
 	<script src="vendors/scripts/process.js"></script>
@@ -290,5 +322,39 @@ async function addProductList(event){
 	<script src="src/plugins/datatables/js/pdfmake.min.js"></script>
 	<script src="src/plugins/datatables/js/vfs_fonts.js"></script>
 	<!-- Datatable Setting js -->
-	<script src="vendors/scripts/datatable-setting.js"></script></body>
+	<script src="vendors/scripts/datatable-setting.js"></script>
+	
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+
+
+
+$(document).ready(function () {
+	$(document).on('focus', '.autocomplete-product', function () {
+		const $this = $(this); 
+        const id = $this.attr('id');
+        if (!$this.data('autocomplete-initialized')) {
+    		$.ajax({
+    			url: "getProductList",
+    			type: "GET",
+    			dataType: "Json",
+    			success: function(data) {
+    				$this.autocomplete({
+                        source: data,
+                        minLength: 1,
+                        select: function (event, ui) {
+                            $this.val(ui.item.value); // 선택된 값 설정
+                            productChangeGeneric($this.attr('id'), ui.item.value); // 공통 함수 호출
+                            return false; // 기본 동작 방지
+                        }
+                    });
+    			}
+    		});
+    		$this.data('autocomplete-initialized', true);
+        }
+	});
+});
+</script>
+</body>
 </html>

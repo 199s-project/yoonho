@@ -53,19 +53,20 @@
 	
 	
 	
-	<select id="orderList" resultType="OrderformVO">
-	    SELECT 
-	        orderform.*,
-	        SUM(orderformdetail.orderdetail_price) AS total_price
-	    FROM 
-	        orderform
-	    JOIN 
-	        orderformdetail
-	    ON 
-	        orderform.orderform_num = orderformdetail.orderform_num
-	    GROUP BY 
-	        orderform.orderform_num;
-	</select> 
+   <select id="orderList" resultType="OrderformVO">
+       SELECT 
+           orderform.*,
+           SUM(orderformdetail.orderdetail_price) AS total_price
+       FROM 
+           orderform
+       JOIN 
+           orderformdetail
+       ON 
+           orderform.orderform_num = orderformdetail.orderform_num
+       GROUP BY 
+           orderform.orderform_num
+       order by orderform.orderform_regdate desc;
+   </select>
 	<!-- 물품 판매 리스트 -->
 	<select id="quotationList" resultType="QuotationVO">
 	   SELECT 
@@ -82,28 +83,7 @@
 	    order by quotation.quot_regdate desc;
 	</select>	
 	
-	<select id="allFormList" resultType="QuotationVO">
-		SELECT 
-	           *,
-	            concat('quot', quot_num) as this_num
-	            
-	       FROM 
-	           quotation
-	       GROUP BY 
-	           quotation.quot_num
-	      union ALL
-	        SELECT
-	         *,
-	           concat('order', orderform_num) as this_num
-	       FROM 
-	           orderform
-	       GROUP BY 
-	           orderform.orderform_num;
-	</select>
-	
-	<select id="getProductionList" resultType="ProductionVO">
-	select * from production;
-	</select>
+
 	
 	<select id="getCompanyList" resultType="CompanyVO">
 		select *
@@ -124,10 +104,10 @@
 		
 	<insert id="insertOrderform" parameterType="OrderformVO">
 		insert into orderform (
-			orderform_name, orderform_stat, company_num, company_num2, orderform_content, orderform_regdate, orderform_startDate, orderform_endDate
+			orderform_name, orderform_stat, company_num, company_num2, orderform_content, orderform_regdate, orderform_startDate, orderform_endDate, orderform_code
 			) 
 			values (
-				#{orderform_name}, #{orderform_stat}, #{company_num}, #{company_num2}, #{orderform_content}, now(), #{orderform_startDate}, #{orderform_endDate}
+				#{orderform_name}, #{orderform_stat}, #{company_num}, #{company_num2}, #{orderform_content}, now(), #{orderform_startDate}, #{orderform_endDate}, #{orderform_code}
 				)
 	</insert>
 	
@@ -182,7 +162,13 @@
 
 
 <!-- 나현. 시작. -->
-
+	
+	<!-- 25-02-05 재 업로드 시 pd_check 2로 재업로드 -->
+	<insert id="ReinsertProduction" parameterType="ProductionVO">
+		insert into production (pd_writedate, pd_writer, pd_dept, pd_startdate, pd_enddate, pd_name, pd_content, pd_check)
+		values (now(), #{pd_writer}, #{pd_dept}, #{pd_startdate}, #{pd_enddate}, #{pd_name}, #{pd_content}, 2)
+	</insert>
+	
 	<!-- 품질 관리 리스트 전체 select -->
 	<select id="getQcList" resultType="QcVO">
 		SELECT qc.*,
@@ -369,7 +355,7 @@
 		WHERE pd_num = #{paper_num};
 	</select>
 	
-	<!-- 생산 문서 detail -->
+	<!-- 생산 문서 detail 중복 -->
 	<insert id="insertProductionDetail" parameterType="ProductionDetailVO">
 		INSERT INTO productiondetail(pd_num, product_name, productiondetail_amount)
 		VALUES (#{pd_num}, #{product_name}, #{productiondetail_amount});		
@@ -379,35 +365,43 @@
 	
 	<!-- 대시보드, 원자재 부적격률 내림차순 5위 (7일간) -->
 	<select id="QcMDashTop5" resultType="QcDashVO">
-	select sub.qc_item_num as item_num, sub.item_name as item_name, sum(sub.total) as total, sum(sub.total_fail) as total_fail, ROUND(SUM(sub.total_fail) / SUM(sub.total) * 100, 2) as fail_per
-	from (select qc.qc_num, qc.qc_item_num, m.material_name as item_name, qc.qc_quan as total, sum(qd.qc_fail_quan) as total_fail, qc.qc_date
-			from qc
-			left join qc_detail qd on qc.qc_num = qd.qc_num
-	        left join material m on qc.qc_item_num = m.material_num
-			where qc.qc_type = "order"
-				and qc.qc_stat = 2
-	            and datediff(now(), qc.qc_date) &lt; 7
-			group by qc.qc_num) as sub
-	group by sub.qc_item_num
-	order by fail_per desc
-	limit 5;
+		select sub.qc_item_num as item_num, sub.item_name as item_name, sum(sub.total) as total, sum(sub.total_fail) as total_fail, ROUND(SUM(sub.total_fail) / SUM(sub.total) * 100, 2) as fail_per
+		from (select qc.qc_num, qc.qc_item_num, m.material_name as item_name, qc.qc_quan as total, sum(qd.qc_fail_quan) as total_fail, qc.qc_date
+				from qc
+				left join qc_detail qd on qc.qc_num = qd.qc_num
+		        left join material m on qc.qc_item_num = m.material_num
+				where qc.qc_type = "order"
+					and qc.qc_stat = 2
+		            and datediff(now(), qc.qc_date) &lt; 7
+				group by qc.qc_num) as sub
+		group by sub.qc_item_num
+		order by fail_per desc
+		limit 5;
 	</select>	
 	
 		<!-- 대시보드, 상품 부적격률 내림차순 5위 (7일간) -->
 	<select id="QcPDashTop5" resultType="QcDashVO">
-	select sub.qc_item_num as item_num, sub.item_name, sum(sub.total) as total, sum(sub.total_fail) as total_fail, ROUND(SUM(sub.total_fail) / SUM(sub.total) * 100, 2) as fail_per
-	from (select qc.qc_num, qc.qc_item_num, p.product_name as item_name, qc.qc_quan as total, sum(qd.qc_fail_quan) as total_fail, qc.qc_date
-			from qc
-			left join qc_detail qd on qc.qc_num = qd.qc_num
-	        left join product p on qc.qc_item_num = p.product_num
-			where qc.qc_type = "plan"
-				and qc.qc_stat = 2
-	            and datediff(now(), qc.qc_date) &lt; 7
-			group by qc.qc_num) as sub
-	group by sub.qc_item_num
-	order by fail_per desc
-	limit 5;
+		select sub.qc_item_num as item_num, sub.item_name, sum(sub.total) as total, sum(sub.total_fail) as total_fail, ROUND(SUM(sub.total_fail) / SUM(sub.total) * 100, 2) as fail_per
+		from (select qc.qc_num, qc.qc_item_num, p.product_name as item_name, qc.qc_quan as total, sum(qd.qc_fail_quan) as total_fail, qc.qc_date
+				from qc
+				left join qc_detail qd on qc.qc_num = qd.qc_num
+		        left join product p on qc.qc_item_num = p.product_num
+				where qc.qc_type = "plan"
+					and qc.qc_stat = 2
+		            and datediff(now(), qc.qc_date) &lt; 7
+				group by qc.qc_num) as sub
+		group by sub.qc_item_num
+		order by fail_per desc
+		limit 5;
 	</select>	
+	
+	<!-- 문서번호를 통해 문서코드 받아오기 -->
+	<select id="getOrderformCode" parameterType="int">
+		SELECT orderform_code
+		FROM orderform
+		WHERE orderform_num = #{orderform_num}
+	</select>
+	
 	
 <!-- 나현. 끝. -->	
 	
@@ -450,9 +444,6 @@
 		where quot_num = #{quot_num}
 	</update>
 	
-	<select id="getInventoryList" resultType="InventoryVO">
-		select * from inventory
-	</select>
 	
 	<select id="getInventoryMaterialList" resultType="InventoryVO">
 		select * from inventory where inven_type = 0
@@ -593,13 +584,51 @@
 	
 
 	
+<!-- 0204 김민성 -->
+	<select id="allFormList" resultType="QuotationVO">
+	SELECT 
+    quotation.*,
+    concat('quot', quotation.quot_num) as this_num,
+    concat('quot', quotation.quot_code) as discord
+		FROM 
+    quotation
+		GROUP BY 
+    quotation.quot_num, quotation.quot_code
+
+	UNION ALL
+
+	SELECT
+    orderform.*,
+    concat('order', orderform.orderform_num) as this_num,
+    concat('order', orderform.orderform_code) as discord
+		FROM 
+    orderform
+		GROUP BY 
+    orderform.orderform_num, orderform.orderform_code;
+	</select>
 	
+	<select id="getProductionList" resultType="ProductionVO">
+		select * from production order by pd_num desc;
+	</select>
+	
+	<select id="getFatoryWorkList" resultType="ProductionVO">
+		select * from production where pd_check = 0 order by pd_num desc;
+	</select>
+	
+	<select id="getFatoryWorkList1" resultType="ProductionVO">
+		select * from production where pd_check = 2;
+	</select>	
+	
+	
+	<select id="getFatoryWorkList2" resultType="ProductionVO">
+		select * from production where pd_check = 99;
+	</select>	
 	<insert id="insertProduction" parameterType="ProductionVO">
 		insert into production (pd_writedate,pd_writer,pd_dept,pd_startdate,pd_enddate,pd_name,pd_content,pd_check)
 		values (now(),#{pd_writer},#{pd_dept},#{pd_startdate},#{pd_enddate},#{pd_name},#{pd_content},0)
 	</insert>
 	
-	<insert id="insertproductiondetail" parameterType="ProductionDetailVO">
+	<insert id="setproductionForm" parameterType="ProductionDetailVO">
 		insert into productiondetail (pd_num,product_name,productiondetail_amount)
 		values
 	 <foreach collection="list" item="planVO" separator=",">
@@ -607,9 +636,6 @@
 	 </foreach>
 	</insert> 
 	
-	<select id="getFatoryWorkList" resultType="ProductionVO">
-		select * from production where pd_check = 0;
-	</select>
 	
 	<select id="getFactoryDetail" parameterType="int" >
 		select * from production where pd_num = #{pd_num}
@@ -632,16 +658,39 @@
    	</select>
    
    
-	<update id="reduceInventoryAmount" parameterType="InventoryVO">
-		update inventory 
-		set inven_amount = inven_amount - #{inven_amount} where inven_name = #{inven_name}
-	</update>
-	
-	  <update id="setPdCheckUpdate" parameterType="ProductionVO"> 
+	     <!-- 원본 -->
+  <update id="reduceInventoryAmount" parameterType="InventoryVO">
+   update inventory 
+   set inven_amount = #{inven_amount} 
+   where inven_name = #{inven_name} 
+   </update> 
+ 	
+  <update id="setPdCheckUpdate" parameterType="ProductionVO"> 
 	update 	production
 	set pd_check = 1 where pd_num = #{pd_num}
   </update>
- 	   
+  
+   <update id="setPdCheckUpdate4" parameterType="ProductionVO"> 
+	update 	production
+	set pd_check = 0 where pd_num = #{pd_num}
+  </update>
+  
+   <update id="setDeleteProduction" parameterType="ProductionVO"> 
+	delete from production where pd_num = #{pd_num}
+  </update>
+  <update id="setDeleteProduction2" parameterType="ProductionVO"> 
+	delete from productiondetail where pd_num = #{pd_num}
+  </update>
+  <!-- 0204 김민성 -->
+  <update id="setPdCheckUpdate3" parameterType="ProductionVO"> 
+	update 	production
+	set pd_check = 99 where pd_num = #{pd_num}
+  </update>
+  <!-- 0204 김민성 -->
+  <update id="setPdCheckUpdate2" parameterType="ProductionVO"> 
+	update 	production
+	set pd_check = 2 where pd_num = #{pd_num}
+  </update>
 	<select id="getfindProductNum" parameterType="ProductVO" resultType="ProductVO">
 		SELECT 
     	product.product_num FROM product
@@ -661,6 +710,10 @@
 	select inven_amount from inventory where inven_type = 0 and inven_name = #{inven_name} ;
 	</select>
 	
+	<select id="getInventoryList" resultType="InventoryVO">
+		select * from inventory;
+	</select>
+	
 	<select id="getProductionVO" parameterType="ProductionVO" >
 		select * from production where pd_num = #{pd_num}
 	</select>
@@ -670,26 +723,26 @@
 	</select>
 	
 	
-	<select id="getRecipeDetailList" parameterType="RecipeDetailVO" >
+	<select id="getRecipeList" parameterType="RecipeDetailVO" >
 		select * from recipedetail
 	</select>
 	
-	<select id="getProductionListByFactoryDetail" parameterType="ProductionDetailVO">
-		select product_name , productiondetail_amount from productiondetail where
-		pd_num = #{pd_num};
+	<!-- ==============================추가분 -->
+	<select id="getProductionListByFactoryDetail" parameterType="int" resultType="ProductionDetailVO">
+	select product_name , productiondetail_amount from productiondetail where
+	pd_num = #{pd_num}
 	</select>
 	
 	<select id="getFindRecipeNum" parameterType="String">
 		select recipe_num from recipe where product_name = #{product_name}	
 	</select>
 	
-	<select id="getFindInvenList" parameterType="ProductionDetailVO">
-		SELECT * FROM inventory
+	<select id="getFindInvenList" parameterType="InventoryVO">
+		   SELECT * FROM inventory
 	</select>
 	
-	
-	
-	<select id = "getPdCheckCount1" resultType="int">
+	<!-- 0203 -->
+    <select id = "getPdCheckCount1" resultType="int">
     	select 
     	 count(pd_check) AS black
     	 from production where pd_check = 1;
@@ -704,7 +757,6 @@
     <select id="getLastProduction" resultType="ProductionVO">
     	SELECT * FROM production ORDER BY pd_num DESC limit 5;
     </select>
-	
 	
 	
 <!-- 김민성 ========================================================================================= -->	
@@ -885,7 +937,7 @@
 		select count(*) from recipe where product_code = #{product_code}
 	</select>
 	
-	<select id="getRecipeList" resultType="RecipeVO">
+	<select id="getRecipeList1" resultType="RecipeVO">
 		select * from Recipe
 	</select>
 	

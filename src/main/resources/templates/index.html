@@ -264,7 +264,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 				
 				<div class="col-xl-4 mb-30">
 					<div class="card-box height-100-p pd-20">
-						<h5 style="display: inline;">생상품 불량률 Top5 (최근 7일)</h5>
+						<h5 style="display: inline;">생산품 불량률 Top5 (최근 7일)</h5>
 						<div id="qcChart2"></div>						
 					</div>
 				</div>
@@ -320,7 +320,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 				
 				<div class="col-xl-4 mb-30">
 					<div class="card-box height-100-p pd-20">
-						<h2 class="h4 mb-20">생산진행 표</h2>
+						<h2 class="h4 mb-20">생산 현황표</h2>
 						<div id="pdCheckCount"></div>
 					</div>
 				</div>
@@ -400,6 +400,9 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 											</th:block>
 											<th:block th:if="${list.pd_check == 2}">
 												<span class="badge badge-warning" th:text="'생산 요청'"></span>
+											</th:block>
+											<th:block th:if="${list.pd_check == 99}">
+												<span class="badge badge-danger" th:text="'휴지통'"></span>
 											</th:block>
 										</td>
 									</tr>
@@ -489,7 +492,7 @@ th.sorting, th.table-plus.datatable-nosort.sorting_asc {
 				</div>
 				
 			<div class="footer-wrap pd-20 mb-20 card-box">
-				DeskApp - Bootstrap 4 Admin Template By <a href="https://github.com/dropways" target="_blank">Ankit Hingarajiya</a>
+				we are all 1995's  <a href="" target="_blank">Suit</a>
 			</div>
 		</div>
 	</div>

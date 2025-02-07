@@ -42,6 +42,7 @@ img.product-image {
 			}
 			.section-bording-td {
 				width: 30px;
+				text-align: center;
 				color: lightgray;
 			}
 		}
@@ -236,10 +237,6 @@ function productDetail(path, num, amount) {
 	    					<tr>
 	    						<td class="heading-td"> 제품 가격 </td> <td class="section-bording-td"> | </td>
 	    						<td> ${price.toLocaleString()}원 </td>
-	    					</tr>
-	    					<tr>
-	    						<td class="heading-td"> 제품 사진 </td> <td class="section-bording-td"> | </td>
-	    						<td> </td>
 	    					</tr>
 	    				</tbody>
 	    			</table>
@@ -481,6 +478,13 @@ function addAppropriateAmount() {
 		cancelButtonText: "Cancel",
 		allowOutsideClick: false,
 		focusConfirm: false,
+		
+	      didOpen: () => {
+	          setTimeout(() => {
+	             document.activeElement.blur();
+	          }, 10);
+	       },
+		
 		preConfirm: () => {
 			const formElements = document.querySelectorAll('#register-table input');
 			const formData = new Map();
@@ -662,8 +666,7 @@ function material_Name_Check() {
 										<div class="product-caption">
 											<h4> <a href="#"><th:block th:text="${product.product_name}"></th:block> </a></h4>
 											<div class="price">
-												<del><th:block th:text="${product.product_price}"></th:block></del>
-												<ins><th:block th:text="${product.product_price}"></th:block></ins>
+												<span style="color: black;">￦<th:block th:text="${#numbers.formatInteger(product.product_price,3,'COMMA')}"></th:block></span>
 											</div>
 										</div>
 									</div>
@@ -762,7 +765,7 @@ function material_Name_Check() {
 			
 			
 			<div class="footer-wrap pd-20 mb-20 card-box">
-				DeskApp - Bootstrap 4 Admin Template By <a href="https://github.com/dropways" target="_blank">Ankit Hingarajiya</a>
+				we are all 1995's  <a href="" target="_blank">Suit</a>
 			</div>
 		</div>
 	</div>
